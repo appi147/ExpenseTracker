@@ -1,0 +1,71 @@
+package com.appi147.expensetracker.service;
+
+import com.appi147.expensetracker.auth.GoogleTokenVerifier;
+import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.model.TimedLoginResponse;
+import com.appi147.expensetracker.model.response.LoginResponse;
+import com.appi147.expensetracker.repository.UserRepository;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
+
+    private final GoogleTokenVerifier googleTokenVerifier;
+    private final UserRepository userRepository;
+    private final Cache<String, TimedLoginResponse> userLoginCache;
+
+
+    public LoginResponse getUserData(String token) throws GeneralSecurityException, IOException {
+        TimedLoginResponse cached = userLoginCache.getIfPresent(token);
+        if (cached != null) {
+            return cached.response();
+        }
+
+        GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
+
+        // unique user id 255 chars
+        String sub = payload.getSubject();
+
+        // check if sub in db
+        Optional<User> userOptional = userRepository.findById(sub);
+        String name = (String) payload.get("name");
+        String email = (String) payload.get("email");
+        String firstName = (String) payload.get("given_name");
+        String lastName = (String) payload.get("family_name");
+        String pictureUrl = (String) payload.get("picture");
+        User user;
+        if (userOptional.isEmpty()) {
+            user = new User();
+            user.setUserId(sub);
+        } else {
+            user = userOptional.get();
+        }
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setFullName(name);
+        user.setEmail(email);
+        user.setPictureUrl(pictureUrl);
+        userRepository.save(user);
+        userRepository.flush();
+        log.info("Cache missed for {}", email);
+
+        LoginResponse response = new LoginResponse(user);
+        Long expirationSeconds = payload.getExpirationTimeSeconds();
+        long ttlMillis = (payload.getExpirationTimeSeconds() * 1000) - System.currentTimeMillis();
+        if (ttlMillis > 0) {
+            userLoginCache.put(token, new TimedLoginResponse(response, expirationSeconds));
+        }
+
+        return response;
+    }
+}
