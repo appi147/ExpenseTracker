@@ -10,3 +10,23 @@ CREATE TABLE "user" (
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ
 );
+
+CREATE TABLE category (
+    cat_id BIGSERIAL PRIMARY KEY,
+    label VARCHAR(100),
+    created_by VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    CONSTRAINT fk_category_created_by FOREIGN KEY (created_by) REFERENCES user(user_id)
+);
+
+CREATE TABLE sub_category (
+    sub_cat_id BIGSERIAL PRIMARY KEY,
+    label VARCHAR(100),
+    cat_id BIGINT NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    CONSTRAINT fk_subcategory_cat_id FOREIGN KEY (cat_id) REFERENCES category(cat_id),
+    CONSTRAINT fk_subcategory_created_by FOREIGN KEY (created_by) REFERENCES user(user_id)
+);
