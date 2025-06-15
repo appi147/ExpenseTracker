@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
@@ -55,8 +58,7 @@ public class UserService {
         user.setFullName(name);
         user.setEmail(email);
         user.setPictureUrl(pictureUrl);
-        userRepository.save(user);
-        userRepository.flush();
+
         log.info("Cache missed for {}", email);
 
         LoginResponse response = new LoginResponse(user);
@@ -64,6 +66,9 @@ public class UserService {
         long ttlMillis = (payload.getExpirationTimeSeconds() * 1000) - System.currentTimeMillis();
         if (ttlMillis > 0) {
             userLoginCache.put(token, new TimedLoginResponse(response, expirationSeconds));
+            user.setLastLogin(ZonedDateTime.now(ZoneOffset.UTC));
+            userRepository.save(user);
+            userRepository.flush();
         }
 
         return response;

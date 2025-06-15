@@ -38,8 +38,4 @@ public class User extends Auditable {
     @Column(name = "last_login")
     private ZonedDateTime lastLogin;
 
-    @PreUpdate
-    public void onUpdate() {
-        this.lastLogin = ZonedDateTime.now(ZoneOffset.UTC);
-    }
 }
