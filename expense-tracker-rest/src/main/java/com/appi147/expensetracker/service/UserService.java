@@ -2,10 +2,8 @@ package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.GoogleTokenVerifier;
 import com.appi147.expensetracker.entity.User;
-import com.appi147.expensetracker.model.TimedLoginResponse;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.repository.UserRepository;
-import com.github.benmanes.caffeine.cache.Cache;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -25,15 +22,8 @@ public class UserService {
 
     private final GoogleTokenVerifier googleTokenVerifier;
     private final UserRepository userRepository;
-    private final Cache<String, TimedLoginResponse> userLoginCache;
-
 
     public LoginResponse getUserData(String token) throws GeneralSecurityException, IOException {
-        TimedLoginResponse cached = userLoginCache.getIfPresent(token);
-        if (cached != null) {
-            return cached.response();
-        }
-
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
 
         // unique user id 255 chars
@@ -58,19 +48,10 @@ public class UserService {
         user.setFullName(name);
         user.setEmail(email);
         user.setPictureUrl(pictureUrl);
+        user.setLastLogin(ZonedDateTime.now(ZoneOffset.UTC));
+        userRepository.save(user);
+        userRepository.flush();
 
-        log.info("Cache missed for {}", email);
-
-        LoginResponse response = new LoginResponse(user);
-        Long expirationSeconds = payload.getExpirationTimeSeconds();
-        long ttlMillis = (payload.getExpirationTimeSeconds() * 1000) - System.currentTimeMillis();
-        if (ttlMillis > 0) {
-            userLoginCache.put(token, new TimedLoginResponse(response, expirationSeconds));
-            user.setLastLogin(ZonedDateTime.now(ZoneOffset.UTC));
-            userRepository.save(user);
-            userRepository.flush();
-        }
-
-        return response;
+        return new LoginResponse(user);
     }
 }
