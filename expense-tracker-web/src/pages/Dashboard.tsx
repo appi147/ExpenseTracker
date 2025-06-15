@@ -1,11 +1,10 @@
-// src/pages/Dashboard.tsx
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from '@/components/Navbar';
 
 const Dashboard = () => {
-  const { token, logout, user } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
