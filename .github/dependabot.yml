@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/expense-tracker-web"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/expense-tracker-rest"
+    schedule:
+      interval: "weekly"
