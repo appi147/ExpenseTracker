@@ -1,16 +1,10 @@
-name: CI with Maven and Node
+name: Java CI with Maven
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-permissions:
-  contents: write
-  id-token: write
-  actions: read
-  security-events: write
 
 jobs:
   build:
@@ -26,25 +20,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install frontend dependencies
-        working-directory: ./expense-tracker-web
-        run: npm install
-
-      - name: Upload Node dependency graph
-        uses: github/dependency-submission-action@v3
-        with:
-          ecosystem: npm
-          directory: ./expense-tracker-web
-
       - name: Build backend with Maven
         working-directory: ./expense-tracker-rest
         run: mvn -B package --file pom.xml
-
-      - name: Upload Maven dependency graph
-        uses: advanced-security/maven-dependency-submission-action@v4
-        continue-on-error: true
