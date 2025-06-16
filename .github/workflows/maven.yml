@@ -35,6 +35,12 @@ jobs:
         working-directory: ./expense-tracker-web
         run: npm install
 
+      - name: Upload Node dependency graph
+        uses: github/dependency-submission-action@v3
+        with:
+          ecosystem: npm
+          directory: ./expense-tracker-web
+
       - name: Build backend with Maven
         working-directory: ./expense-tracker-rest
         run: mvn -B package --file pom.xml
