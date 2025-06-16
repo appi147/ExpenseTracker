@@ -23,7 +23,14 @@ public class SecurityConfig {
         http
                 .securityMatcher(request -> true) // matches all requests
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/login").permitAll()
+                        .requestMatchers(
+                                "/api/user/login",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/swagger-resources/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
