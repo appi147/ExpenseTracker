@@ -49,8 +49,7 @@ public class UserService {
         user.setEmail(email);
         user.setPictureUrl(pictureUrl);
         user.setLastLogin(ZonedDateTime.now(ZoneOffset.UTC));
-        userRepository.save(user);
-        userRepository.flush();
+        userRepository.saveAndFlush(user);
 
         return new LoginResponse(user);
     }
