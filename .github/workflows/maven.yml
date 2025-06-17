@@ -1,5 +1,8 @@
 name: Maven Build Monorepo
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main" ]
