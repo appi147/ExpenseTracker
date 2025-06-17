@@ -1,8 +1,8 @@
 import React from "react";
-import { GoogleLogin } from "@react-oauth/google";
-import type { CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Login: React.FC = () => {
   const { setAuthToken } = useAuth();
@@ -22,9 +22,17 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-page">
-      <h2>Welcome to Expense Tracker</h2>
-      <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
+    <div className="flex items-center justify-center min-h-screen w-full bg-background">
+      <Card className="w-full max-w-sm p-6 rounded-xl shadow-lg bg-card">
+        <CardHeader>
+          <CardTitle className="text-center text-xl font-semibold">
+            Welcome to Expense Tracker
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center">
+          <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
+        </CardContent>
+      </Card>
     </div>
   );
 };
