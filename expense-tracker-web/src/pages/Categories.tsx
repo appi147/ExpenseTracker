@@ -16,11 +16,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { Pencil, Settings } from "lucide-react";
+import ManageSubcategoriesModal from "./ManageSubcategoriesModal";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
-  const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
+    null
+  );
+  const [editingLabel, setEditingLabel] = useState("");
+  const [activeSubCatCategory, setActiveSubCatCategory] =
+    useState<Category | null>(null);
 
   const loadData = async () => {
     const cats = await getAllCategories();
@@ -31,28 +38,28 @@ const CategoriesPage = () => {
     loadData();
   }, []);
 
-  const handleCreateOrUpdateCategory = async () => {
+  const handleCreateCategory = async () => {
     if (!newCategoryLabel.trim()) return;
-
     try {
-      if (editCategoryId !== null) {
-        await updateCategory(editCategoryId, { label: newCategoryLabel });
-        toast.success("Category updated successfully.");
-        setEditCategoryId(null);
-      } else {
-        await createCategory({ label: newCategoryLabel });
-        toast.success("Category created successfully.");
-      }
+      await createCategory({ label: newCategoryLabel });
+      toast.success("Category created successfully.");
       setNewCategoryLabel("");
       loadData();
-    } catch (error) {
-      toast.error("Something went wrong while saving the category.");
+    } catch {
+      toast.error("Failed to create category.");
     }
   };
 
-  const handleEdit = (cat: Category) => {
-    setNewCategoryLabel(cat.label);
-    setEditCategoryId(cat.categoryId);
+  const handleEditSubmit = async (id: number) => {
+    if (!editingLabel.trim()) return;
+    try {
+      await updateCategory(id, { label: editingLabel });
+      toast.success("Category updated successfully.");
+      setEditingCategoryId(null);
+      loadData();
+    } catch {
+      toast.error("Failed to update category.");
+    }
   };
 
   return (
@@ -67,33 +74,61 @@ const CategoriesPage = () => {
               onChange={(e) => setNewCategoryLabel(e.target.value)}
               placeholder="New category label"
             />
-            <Button
-              onClick={handleCreateOrUpdateCategory}
-              className="cursor-pointer"
-            >
-              {editCategoryId ? "Update" : "Add Category"}
-            </Button>
+            <Button onClick={handleCreateCategory}>Add Category</Button>
           </div>
 
           <ul className="list-disc ml-5 space-y-2">
             {categories.map((cat) => (
               <li key={cat.categoryId} className="flex items-center gap-2">
-                <span className="font-medium">{cat.label}</span>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(cat)}
-                  className="cursor-pointer"
-                >
-                  Edit
-                </Button>
+                {editingCategoryId === cat.categoryId ? (
+                  <>
+                    <Input
+                      value={editingLabel}
+                      onChange={(e) => setEditingLabel(e.target.value)}
+                      className="w-64"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => handleEditSubmit(cat.categoryId)}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingCategoryId(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-medium">{cat.label}</span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingCategoryId(cat.categoryId);
+                              setEditingLabel(cat.label);
+                            }}
+                            className="hover:bg-muted"
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Edit category</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </>
+                )}
 
                 {cat.deletable ? (
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="cursor-pointer"
                     onClick={() =>
                       deleteCategory(cat.categoryId)
                         .then(() => {
@@ -119,7 +154,6 @@ const CategoriesPage = () => {
                             size="sm"
                             disabled
                             className="cursor-not-allowed"
-                            title="Cannot delete: used in subcategories"
                           >
                             Delete
                           </Button>
@@ -131,11 +165,29 @@ const CategoriesPage = () => {
                     </Tooltip>
                   </TooltipProvider>
                 )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveSubCatCategory(cat)}
+                  className="ml-2 flex gap-1 items-center"
+                >
+                  <Settings className="w-4 h-4" /> Manage Subcategories
+                </Button>
               </li>
             ))}
           </ul>
         </CardContent>
       </Card>
+
+      {/* Subcategory Modal */}
+      {activeSubCatCategory && (
+        <ManageSubcategoriesModal
+          category={activeSubCatCategory}
+          onClose={() => setActiveSubCatCategory(null)}
+          onRefresh={loadData}
+        />
+      )}
     </div>
   );
 };
