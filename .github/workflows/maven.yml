@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+          cache-dependency-path: expense-tracker-web/package-lock.json
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
