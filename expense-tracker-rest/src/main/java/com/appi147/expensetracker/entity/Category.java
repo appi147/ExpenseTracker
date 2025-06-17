@@ -24,4 +24,6 @@ public class Category extends Auditable {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
+    @Transient
+    private boolean deletable = false;
 }

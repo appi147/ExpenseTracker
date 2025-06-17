@@ -3,9 +3,11 @@ package com.appi147.expensetracker.repository;
 import com.appi147.expensetracker.entity.SubCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> {
 
@@ -13,5 +15,8 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     Optional<SubCategory> findByIdWithCreator(Long id);
 
     List<SubCategory> findAllByCreatedBy_UserId(String userId);
+
+    @Query("SELECT DISTINCT s.category.categoryId FROM SubCategory s WHERE s.createdBy.userId = :userId")
+    Set<Long> findUsedCategoryIdsByUser(@Param("userId") String userId);
 
 }
