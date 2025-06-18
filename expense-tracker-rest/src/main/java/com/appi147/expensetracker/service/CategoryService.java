@@ -6,6 +6,7 @@ import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.CategoryCreateRequest;
+import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.repository.CategoryRepository;
 import com.appi147.expensetracker.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class CategoryService {
         return categoryRepository.saveAndFlush(category);
     }
 
-    public Category editCategory(Long categoryId, CategoryCreateRequest request) {
+    public Category editCategory(Long categoryId, LabelUpdateRequest request) {
         Category category = getCategoryIfOwnedByCurrentUser(categoryId);
         log.info("Category edit by user [{}] for category [{}]", category.getCreatedBy().getUserId(), categoryId);
         category.setLabel(request.getLabel());

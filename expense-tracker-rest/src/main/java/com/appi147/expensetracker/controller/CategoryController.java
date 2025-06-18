@@ -2,6 +2,7 @@ package com.appi147.expensetracker.controller;
 
 import com.appi147.expensetracker.entity.Category;
 import com.appi147.expensetracker.model.request.CategoryCreateRequest;
+import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,7 +45,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public Category editCategory(@PathVariable Long id, @RequestBody CategoryCreateRequest request) {
+    public Category editCategory(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
         return categoryService.editCategory(id, request);
     }
 

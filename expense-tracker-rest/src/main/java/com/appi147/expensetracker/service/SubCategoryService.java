@@ -6,6 +6,7 @@ import com.appi147.expensetracker.entity.SubCategory;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
+import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.model.request.SubCategoryCreateRequest;
 import com.appi147.expensetracker.repository.CategoryRepository;
 import com.appi147.expensetracker.repository.SubCategoryRepository;
@@ -22,6 +23,11 @@ public class SubCategoryService {
 
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
+
+    public List<SubCategory> getAllSubCategories(Long categoryId) {
+        User requester = UserContext.getCurrentUser();
+        return subCategoryRepository.findAllByCategoryIdAndUserId(categoryId, requester.getUserId());
+    }
 
     public SubCategory createSubCategory(SubCategoryCreateRequest request) {
         User requester = UserContext.getCurrentUser();
@@ -44,19 +50,8 @@ public class SubCategoryService {
         return getSubCategoryIfOwnedByCurrentUser(subCategoryId);
     }
 
-    public List<SubCategory> getAllSubCategories() {
-        User requester = UserContext.getCurrentUser();
-        return subCategoryRepository.findAllByCreatedBy_UserId(requester.getUserId());
-    }
-
-    // We do not allow changing the parent category once a subcategory is created
-    public SubCategory editSubCategory(Long subCategoryId, SubCategoryCreateRequest request) {
+    public SubCategory editSubCategory(Long subCategoryId, LabelUpdateRequest request) {
         SubCategory subCategory = getSubCategoryIfOwnedByCurrentUser(subCategoryId);
-
-        if (!subCategory.getCategory().getCategoryId().equals(request.getCategoryId())) {
-            throw new ForbiddenException("You cannot change the parent category of a sub-category.");
-        }
-
         subCategory.setLabel(request.getLabel());
         return subCategoryRepository.saveAndFlush(subCategory);
     }

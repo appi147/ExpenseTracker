@@ -25,4 +25,7 @@ public class SubCategory extends Auditable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @Transient
+    private boolean deletable = false;
 }

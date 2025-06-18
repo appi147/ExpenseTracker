@@ -14,7 +14,16 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     @Query("SELECT s FROM SubCategory s JOIN FETCH s.createdBy JOIN FETCH s.category WHERE s.subCategoryId = :id")
     Optional<SubCategory> findByIdWithCreator(Long id);
 
-    List<SubCategory> findAllByCreatedBy_UserId(String userId);
+    @Query("""
+                SELECT s FROM SubCategory s
+                JOIN FETCH s.createdBy
+                JOIN FETCH s.category
+                WHERE s.category.categoryId = :categoryId AND s.createdBy.id = :userId
+            """)
+    List<SubCategory> findAllByCategoryIdAndUserId(
+            @Param("categoryId") Long categoryId,
+            @Param("userId") String userId
+    );
 
     @Query("SELECT DISTINCT s.category.categoryId FROM SubCategory s WHERE s.createdBy.userId = :userId")
     Set<Long> findUsedCategoryIdsByUser(@Param("userId") String userId);

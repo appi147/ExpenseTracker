@@ -1,6 +1,7 @@
 package com.appi147.expensetracker.controller;
 
 import com.appi147.expensetracker.entity.SubCategory;
+import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.model.request.SubCategoryCreateRequest;
 import com.appi147.expensetracker.service.SubCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,12 +42,12 @@ public class SubCategoryController {
     }
 
     @GetMapping
-    @Operation(summary = "List all sub-categories of current user", responses = {
+    @Operation(summary = "List all sub-categories of current user and given category", responses = {
             @ApiResponse(responseCode = "200", description = "List returned"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public List<SubCategory> getAll() {
-        return subCategoryService.getAllSubCategories();
+    public List<SubCategory> getAll(@RequestParam Long categoryId) {
+        return subCategoryService.getAllSubCategories(categoryId);
     }
 
     @PutMapping("/{id}")
@@ -55,7 +56,7 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "404", description = "Sub-category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own this sub-category")
     })
-    public SubCategory update(@PathVariable Long id, @RequestBody SubCategoryCreateRequest request) {
+    public SubCategory update(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
         return subCategoryService.editSubCategory(id, request);
     }
 
