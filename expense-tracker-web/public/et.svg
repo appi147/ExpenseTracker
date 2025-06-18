@@ -1,0 +1,6 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#2563eb"/>
+  <text x="50%" y="40%" text-anchor="middle" font-size="26" fill="white" font-family="Segoe UI, sans-serif">₹</text>
+  <path d="M20 46h6v-12h-6v12zm10 0h6V30h-6v16zm10 0h6V22h-6v24z" fill="white"/>
+</svg>
