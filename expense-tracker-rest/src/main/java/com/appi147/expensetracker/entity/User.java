@@ -31,8 +31,8 @@ public class User extends Auditable {
     @Column(name = "picture_url")
     private String pictureUrl;
 
-    @Column(name = "role")
-    private String role = "user";
+    @Column(name = "role", length = 10)
+    private String role = "USER";
 
     @Column(name = "last_login")
     private ZonedDateTime lastLogin;

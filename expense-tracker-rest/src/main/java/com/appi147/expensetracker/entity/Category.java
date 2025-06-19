@@ -16,7 +16,7 @@ public class Category extends Auditable {
     @Column(name = "cat_id")
     private Long categoryId;
 
-    @Column(name = "label")
+    @Column(name = "label", length = 100)
     private String label;
 
     @JsonIgnore
