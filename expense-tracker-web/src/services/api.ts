@@ -18,9 +18,4 @@ export const getUserProfile = async () => {
   return response.data;
 };
 
-export const getMonthlyExpenseTotal = async (): Promise<number> => {
-  const response = await API.get("/expenses/monthly-total");
-  return response.data.total;
-};
-
 export default API;
