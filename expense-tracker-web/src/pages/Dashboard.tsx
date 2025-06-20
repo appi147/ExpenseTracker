@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
+import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
 
 const Dashboard = () => {
   const { token } = useAuth();
@@ -12,27 +13,24 @@ const Dashboard = () => {
   const [monthlyTotal, setMonthlyTotal] = useState<number | null>(null);
   const [last30DaysTotal, setLast30DaysTotal] = useState<number | null>(null);
   const [showLast30Days, setShowLast30Days] = useState(false);
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+
+  const loadExpenses = async () => {
+    try {
+      const { last30Days, currentMonth } = await getMonthlyExpense();
+      setMonthlyTotal(currentMonth);
+      setLast30DaysTotal(last30Days);
+    } catch (err) {
+      console.error("Failed to fetch monthly total:", err);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
       navigate("/login");
+      return;
     }
-  }, [token]);
-
-  useEffect(() => {
-    const fetchMonthlyTotal = async () => {
-      try {
-        const { last30Days, currentMonth } = await getMonthlyExpense();
-        setMonthlyTotal(currentMonth);
-        setLast30DaysTotal(last30Days);
-      } catch (err) {
-        console.error("Failed to fetch monthly total:", err);
-      }
-    };
-
-    if (token) {
-      fetchMonthlyTotal();
-    }
+    loadExpenses();
   }, [token]);
 
   const options = [
@@ -44,7 +42,7 @@ const Dashboard = () => {
     {
       label: "Add Expense",
       description: "Record a new expense quickly",
-      onClick: () => navigate("/expenses/new"),
+      onClick: () => setIsAddExpenseOpen(true),
     },
     {
       label: "View Expenses",
@@ -99,7 +97,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Navigation */}
         <div className="grid gap-4 md:grid-cols-2">
           {options.map((opt) => (
             <Card key={opt.label} className="hover:shadow-md transition">
@@ -116,6 +113,12 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+
+      <AddExpenseModal
+        isOpen={isAddExpenseOpen}
+        onClose={() => setIsAddExpenseOpen(false)}
+        onExpenseAdded={loadExpenses}
+      />
     </div>
   );
 };

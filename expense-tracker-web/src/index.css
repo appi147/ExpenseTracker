@@ -118,3 +118,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.no-date-icon::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  pointer-events: none;
+}
