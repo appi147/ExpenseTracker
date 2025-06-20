@@ -9,12 +9,14 @@ import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.model.request.SubCategoryCreateRequest;
 import com.appi147.expensetracker.repository.CategoryRepository;
+import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +25,17 @@ public class SubCategoryService {
 
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final ExpenseRepository expenseRepository;
 
     public List<SubCategory> getAllSubCategories(Long categoryId) {
         User requester = UserContext.getCurrentUser();
-        return subCategoryRepository.findAllByCategoryIdAndUserId(categoryId, requester.getUserId());
+        Set<Long> subCategoryIdsUsedInExpenses = expenseRepository.findDistinctSubCategoryIdsByUserId(requester.getUserId());
+        List<SubCategory> subCategories = subCategoryRepository.findAllByCategoryIdAndUserId(categoryId, requester.getUserId());
+        for (SubCategory subCategory : subCategories) {
+            boolean usedInExpenses = subCategoryIdsUsedInExpenses.contains(subCategory.getSubCategoryId());
+            subCategory.setDeletable(!usedInExpenses);
+        }
+        return subCategories;
     }
 
     public SubCategory createSubCategory(SubCategoryCreateRequest request) {

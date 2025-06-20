@@ -8,6 +8,7 @@ import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.CategoryCreateRequest;
 import com.appi147.expensetracker.model.request.LabelUpdateRequest;
 import com.appi147.expensetracker.repository.CategoryRepository;
+import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,17 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
+    private final ExpenseRepository expenseRepository;
 
     public List<Category> getAllCategoriesForCurrentUser() {
         User requester = UserContext.getCurrentUser();
         List<Category> categories =  categoryRepository.findAllByCreatedBy_UserId(requester.getUserId());
-        Set<Long> usedCategoryIds = subCategoryRepository.findUsedCategoryIdsByUser(requester.getUserId());
+        Set<Long> categoryIdsUsedInSubCategories = subCategoryRepository.findUsedCategoryIdsByUser(requester.getUserId());
+        Set<Long> categoryIdsUsedInExpenses = expenseRepository.findDistinctCategoryIdsByUserId(requester.getUserId());
         for (Category category : categories) {
-            category.setDeletable(!usedCategoryIds.contains(category.getCategoryId()));
+            boolean usedInSubCategories = categoryIdsUsedInSubCategories.contains(category.getCategoryId());
+            boolean usedInExpenses = categoryIdsUsedInExpenses.contains(category.getCategoryId());
+            category.setDeletable(!usedInSubCategories && !usedInExpenses);
         }
         return categories;
     }

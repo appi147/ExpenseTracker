@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
@@ -21,4 +22,18 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("""
+                SELECT DISTINCT e.subCategory.category.categoryId
+                FROM Expense e
+                WHERE e.createdBy.id = :userId
+            """)
+    Set<Long> findDistinctCategoryIdsByUserId(@Param("userId") String userId);
+
+    @Query("""
+                SELECT DISTINCT e.subCategory.subCategoryId
+                FROM Expense e
+                WHERE e.createdBy.id = :userId
+            """)
+    Set<Long> findDistinctSubCategoryIdsByUserId(@Param("userId") String userId);
 }

@@ -19,10 +19,12 @@ import {
   updateSubCategory,
   deleteSubCategory,
 } from "@/services/sub-category-service";
+import SubCategoryItem from "./SubCategoryItem";
 
 interface SubCategory {
   subCategoryId: number;
   label: string;
+  deletable: boolean;
 }
 
 interface Props {
@@ -31,12 +33,12 @@ interface Props {
 }
 
 export default function CategoryItem({ category, reloadCategories }: Props) {
-  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
+    null
+  );
   const [editingLabel, setEditingLabel] = useState(category.label);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [newSubLabel, setNewSubLabel] = useState("");
-  const [editingSubId, setEditingSubId] = useState<number | null>(null);
-  const [editingSubLabel, setEditingSubLabel] = useState("");
   const [open, setOpen] = useState(false);
 
   const loadSubcategories = async () => {
@@ -73,7 +75,10 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
   const handleSubCreate = async () => {
     if (!newSubLabel.trim()) return;
     try {
-      await createSubCategory({ label: newSubLabel, categoryId: category.categoryId });
+      await createSubCategory({
+        label: newSubLabel,
+        categoryId: category.categoryId,
+      });
       setNewSubLabel("");
       loadSubcategories();
       reloadCategories();
@@ -83,13 +88,11 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
     }
   };
 
-  const handleSubUpdate = async () => {
-    if (!editingSubLabel.trim() || editingSubId === null) return;
+  const handleSubUpdate = async (subId: number, label: string) => {
+    if (!label.trim()) return;
     try {
-      await updateSubCategory(editingSubId, { label: editingSubLabel });
+      await updateSubCategory(subId, { label });
       toast.success("Subcategory updated");
-      setEditingSubId(null);
-      setEditingSubLabel("");
       loadSubcategories();
     } catch {
       toast.error("Failed to update subcategory");
@@ -123,8 +126,14 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
                 onChange={(e) => setEditingLabel(e.target.value)}
                 className="w-64"
               />
-              <Button size="sm" onClick={handleCategoryUpdate}>Save</Button>
-              <Button variant="ghost" size="sm" onClick={() => setEditingCategoryId(null)}>
+              <Button size="sm" onClick={handleCategoryUpdate}>
+                Save
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditingCategoryId(null)}
+              >
                 Cancel
               </Button>
             </>
@@ -154,38 +163,13 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
       <AccordionContent>
         <div className="space-y-2">
           {subcategories.map((sub) => (
-            <div key={sub.subCategoryId} className="flex items-center justify-between">
-              {editingSubId === sub.subCategoryId ? (
-                <>
-                  <Input
-                    value={editingSubLabel}
-                    onChange={(e) => setEditingSubLabel(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button size="sm" onClick={handleSubUpdate}>Save</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingSubId(null)}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <span>{sub.label}</span>
-                  <div className="flex gap-2 items-center">
-                    <Pencil
-                      className="w-4 h-4 cursor-pointer"
-                      onClick={() => {
-                        setEditingSubId(sub.subCategoryId);
-                        setEditingSubLabel(sub.label);
-                      }}
-                    />
-                    <Trash2
-                      className="w-4 h-4 text-destructive cursor-pointer"
-                      onClick={() => handleSubDelete(sub.subCategoryId)}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+            <SubCategoryItem
+              key={sub.subCategoryId}
+              sub={sub}
+              categoryId={category.categoryId}
+              onUpdate={(subId, label) => handleSubUpdate(subId, label)}
+              onDelete={(subId) => handleSubDelete(subId)}
+            />
           ))}
 
           <div className="flex gap-2 mt-2">
