@@ -14,6 +14,7 @@ public class LoginResponse {
     private String lastName;
     private String fullName;
     private String pictureUrl;
+    private String role;
 
     @JsonIgnore
     private User user;
@@ -24,6 +25,7 @@ public class LoginResponse {
         this.lastName = user.getLastName();
         this.fullName = user.getFullName();
         this.pictureUrl = user.getPictureUrl();
+        this.role = user.getRole();
         this.user = user;
     }
 }

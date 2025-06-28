@@ -24,7 +24,7 @@ public class UserController {
         String token = authorizationHeader.substring(7); // TFAR
 
         try {
-            return ResponseEntity.ok(userService.getUserData(token));
+            return ResponseEntity.ok(userService.login(token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
         }

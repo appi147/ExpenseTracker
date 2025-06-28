@@ -2,6 +2,7 @@ package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.GoogleTokenVerifier;
 import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.exception.UnauthorizedException;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -24,6 +25,17 @@ public class UserService {
     private final UserRepository userRepository;
 
     public LoginResponse getUserData(String token) throws GeneralSecurityException, IOException {
+        GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
+        String sub = payload.getSubject();
+        Optional<User> userOptional = userRepository.findById(sub);
+        if (userOptional.isEmpty()) {
+            throw new UnauthorizedException("Unauthorized");
+        }
+        User user = userOptional.get();
+        return new LoginResponse(user);
+    }
+
+    public LoginResponse login(String token) throws GeneralSecurityException, IOException {
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
 
         // unique user id 255 chars
