@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { FileIcon, Pencil, Trash2 } from "lucide-react";
 
 interface SubCategoryItemProps {
   sub: {
@@ -14,7 +14,11 @@ interface SubCategoryItemProps {
   onDelete: (subId: number) => void;
 }
 
-export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategoryItemProps) {
+export default function SubCategoryItem({
+  sub,
+  onUpdate,
+  onDelete,
+}: SubCategoryItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(sub.label);
 
@@ -25,7 +29,7 @@ export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategory
   };
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between ml-4 pl-2 border-l border-gray-700">
       {isEditing ? (
         <>
           <Input
@@ -33,12 +37,19 @@ export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategory
             onChange={(e) => setEditLabel(e.target.value)}
             className="flex-1"
           />
-          <Button size="sm" onClick={handleSave}>Save</Button>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
+          <Button size="sm" onClick={handleSave}>
+            Save
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
+            Cancel
+          </Button>
         </>
       ) : (
         <>
-          <span>{sub.label}</span>
+          <div className="flex items-center gap-2 text-sm">
+            <FileIcon className="w-3 h-3" />
+            <span>{sub.label}</span>
+          </div>
           <div className="flex gap-2 items-center">
             <Pencil
               className="w-4 h-4 cursor-pointer"
@@ -50,9 +61,7 @@ export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategory
                 onClick={() => onDelete(sub.subCategoryId)}
               />
             ) : (
-              <Trash2
-                className="w-4 h-4 text-muted cursor-not-allowed"
-              />
+              <Trash2 className="w-4 h-4 text-muted cursor-not-allowed" />
             )}
           </div>
         </>

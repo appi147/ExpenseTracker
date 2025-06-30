@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { getAllCategories, createCategory, type Category } from "@/services/category-service";
+import {
+  getAllCategories,
+  createCategory,
+  type Category,
+} from "@/services/category-service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import CategoryItem from "@/components/categories/CategoryItem";
+import { Separator } from "@/components/ui/separator";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -36,8 +41,8 @@ export default function CategoriesPage() {
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <Card>
         <CardContent className="p-4 space-y-4">
-          <h2 className="text-xl font-bold">Categories</h2>
-
+          <h2 className="text-2xl font-bold text-center">Categories</h2>
+          <Separator className="my-4" />
           <div className="flex gap-2">
             <Input
               value={newCategoryLabel}
@@ -49,7 +54,11 @@ export default function CategoriesPage() {
 
           <Accordion type="single" collapsible>
             {categories.map((cat) => (
-              <CategoryItem key={cat.categoryId} category={cat} reloadCategories={loadData} />
+              <CategoryItem
+                key={cat.categoryId}
+                category={cat}
+                reloadCategories={loadData}
+              />
             ))}
           </Accordion>
         </CardContent>

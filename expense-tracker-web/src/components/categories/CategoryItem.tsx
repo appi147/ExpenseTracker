@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, FolderIcon } from "lucide-react";
 import { toast } from "sonner";
 import {
   deleteCategory,
@@ -113,6 +113,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
   return (
     <AccordionItem value={String(category.categoryId)}>
       <AccordionTrigger
+        className="text-xl font-semibold no-underline hover:no-underline"
         onClick={() => {
           setOpen(!open);
           if (!open) loadSubcategories();
@@ -139,20 +140,22 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
             </>
           ) : (
             <>
-              <span className="font-medium">{category.label}</span>
+              <FolderIcon className="w-4 h-4" />
+              <span>{category.label}</span>
               <Button
                 variant="ghost"
                 size="icon"
+                className="h-2 w-2"
                 onClick={() => {
                   setEditingCategoryId(category.categoryId);
                   setEditingLabel(category.label);
                 }}
               >
-                <Pencil className="w-4 h-4 text-muted-foreground" />
+                <Pencil className="w-2 h-2 text-muted-foreground" />
               </Button>
               {category.deletable && (
                 <Trash2
-                  className="w-4 h-4 text-destructive cursor-pointer"
+                  className="w-2 h-2 text-destructive cursor-pointer"
                   onClick={handleCategoryDelete}
                 />
               )}
