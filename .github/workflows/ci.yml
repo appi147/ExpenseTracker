@@ -28,7 +28,7 @@ jobs:
 
       - name: Build all Maven modules
         env:
-          VITE_API_URL: ${{ secrets.EC2_HOST }}/api
+          VITE_API_URL: http://${{ secrets.EC2_HOST }}/api
         run: mvn clean package --file pom.xml
 
       - name: Decode SSH Key
