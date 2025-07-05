@@ -6,6 +6,7 @@ import Profile from "@/pages/Profile";
 import Settings from "@/pages/Settings";
 import Categories from "@/pages/Categories";
 import Layout from "@/components/Layout";
+import Expenses from "@/pages/Expenses";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +30,14 @@ const AppRoutes = () => {
           element={
             <Layout>
               <Categories />
+            </Layout>
+          }
+        />
+        <Route
+          path="/expenses/list"
+          element={
+            <Layout>
+              <Expenses />
             </Layout>
           }
         />

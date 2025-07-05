@@ -8,7 +8,13 @@ import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.model.request.CreateExpenseRequest;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.repository.ExpenseRepository;
+import com.appi147.expensetracker.util.ExpenseSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -58,5 +64,15 @@ public class ExpenseService {
 
     private BigDecimal getExpenseSumInPeriodForUser(String userId, LocalDate from, LocalDate to) {
         return expenseRepository.getSumOfExpensesBetweenDatesForUser(userId, from, to);
+    }
+
+    public Page<Expense> getFilteredExpenses(Long categoryId, Long subCategoryId, String paymentTypeCode,
+                                             LocalDate dateFrom, LocalDate dateTo, int page, int size) {
+        String userId = UserContext.getCurrentUser().getUserId();
+        Specification<Expense> spec = ExpenseSpecification.filter(
+                userId, categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo
+        );
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        return expenseRepository.findAll(spec, pageable);
     }
 }

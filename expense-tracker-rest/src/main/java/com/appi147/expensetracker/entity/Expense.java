@@ -34,7 +34,6 @@ public class Expense extends Auditable {
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_type_id", nullable = false)
     private PaymentType paymentType;

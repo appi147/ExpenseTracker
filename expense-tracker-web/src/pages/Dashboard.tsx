@@ -35,14 +35,14 @@ const Dashboard = () => {
 
   const options = [
     {
-      label: "Manage Categories",
-      description: "Create, edit, or delete categories and subcategories",
-      onClick: () => navigate("/categories"),
-    },
-    {
       label: "Add Expense",
       description: "Record a new expense quickly",
       onClick: () => setIsAddExpenseOpen(true),
+    },
+    {
+      label: "Manage Categories",
+      description: "Create, edit, or delete categories and subcategories",
+      onClick: () => navigate("/categories"),
     },
     {
       label: "View Expenses",

@@ -19,7 +19,6 @@ public class SubCategory extends Auditable {
     @Column(name = "label", length = 100)
     private String label;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id", nullable = false)
     private Category category;

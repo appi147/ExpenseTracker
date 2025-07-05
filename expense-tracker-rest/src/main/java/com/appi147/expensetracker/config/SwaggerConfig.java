@@ -17,6 +17,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+                .addServersItem(new Server().url("http://localhost:8080"))
                 .addServersItem(new Server().url("https://personalexpensetracker.xyz"))
                 .info(new Info()
                         .title("Expense Tracker API")
