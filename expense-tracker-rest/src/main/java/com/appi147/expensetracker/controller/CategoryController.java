@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,11 +24,12 @@ public class CategoryController {
 
     @PostMapping("/create")
     @Operation(summary = "Create a new category", responses = {
-            @ApiResponse(responseCode = "200", description = "Category created"),
+            @ApiResponse(responseCode = "201", description = "Category created"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public Category createCategory(@RequestBody CategoryCreateRequest categoryCreateRequest) {
-        return categoryService.createCategory(categoryCreateRequest);
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryCreateRequest categoryCreateRequest) {
+        Category category = categoryService.createCategory(categoryCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
     @GetMapping("/{id}")
@@ -35,8 +38,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public Category getCategory(@PathVariable Long id) {
-        return categoryService.getCategory(id);
+    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
+        Category category = categoryService.getCategory(id);
+        return ResponseEntity.ok(category);
     }
 
     @PutMapping("/{id}")
@@ -45,18 +49,20 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public Category editCategory(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
-        return categoryService.editCategory(id, request);
+    public ResponseEntity<Category> editCategory(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
+        Category updated = categoryService.editCategory(id, request);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a category", responses = {
-            @ApiResponse(responseCode = "200", description = "Category deleted"),
+            @ApiResponse(responseCode = "204", description = "Category deleted"),
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public void deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -64,7 +70,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "List returned"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public List<Category> getAllCategoriesForCurrentUser() {
-        return categoryService.getAllCategoriesForCurrentUser();
+    public ResponseEntity<List<Category>> getAllCategoriesForCurrentUser() {
+        List<Category> categories = categoryService.getAllCategoriesForCurrentUser();
+        return ResponseEntity.ok(categories);
     }
 }

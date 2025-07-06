@@ -24,13 +24,15 @@ export const createSubCategory = async (payload: {
 };
 
 export const updateSubCategory = async (
-  id: number,
-  payload: { label: string; }
+  subCategoryId: number,
+  payload: { label: string }
 ): Promise<SubCategory> => {
-  const response = await API.put(`/sub-category/${id}`, payload);
+  const response = await API.put(`/sub-category/${subCategoryId}`, payload);
   return response.data;
 };
 
-export const deleteSubCategory = async (id: number): Promise<void> => {
-  await API.delete(`/sub-category/${id}`);
+export const deleteSubCategory = async (
+  subCategoryId: number
+): Promise<void> => {
+  await API.delete(`/sub-category/${subCategoryId}`);
 };

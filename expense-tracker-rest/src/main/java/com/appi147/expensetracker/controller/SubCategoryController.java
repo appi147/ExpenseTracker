@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,18 +19,18 @@ import java.util.List;
 @RequestMapping("/api/sub-category")
 @SecurityRequirement(name = "bearerAuth")
 public class SubCategoryController {
-
     private final SubCategoryService subCategoryService;
 
     @PostMapping("/create")
     @Operation(summary = "Create a new sub-category", responses = {
-            @ApiResponse(responseCode = "200", description = "Sub-category created"),
+            @ApiResponse(responseCode = "201", description = "Sub-category created"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own the category")
     })
-    public SubCategory create(@RequestBody SubCategoryCreateRequest request) {
-        return subCategoryService.createSubCategory(request);
+    public ResponseEntity<SubCategory> create(@RequestBody SubCategoryCreateRequest request) {
+        SubCategory subCategory = subCategoryService.createSubCategory(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(subCategory);
     }
 
     @GetMapping("/{id}")
@@ -37,8 +39,9 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "404", description = "Sub-category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own this sub-category")
     })
-    public SubCategory get(@PathVariable Long id) {
-        return subCategoryService.getSubCategory(id);
+    public ResponseEntity<SubCategory> get(@PathVariable Long id) {
+        SubCategory subCategory = subCategoryService.getSubCategory(id);
+        return ResponseEntity.ok(subCategory);
     }
 
     @GetMapping
@@ -46,8 +49,9 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "200", description = "List returned"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public List<SubCategory> getAll(@RequestParam Long categoryId) {
-        return subCategoryService.getAllSubCategories(categoryId);
+    public ResponseEntity<List<SubCategory>> getAll(@RequestParam Long categoryId) {
+        List<SubCategory> subCategories = subCategoryService.getAllSubCategories(categoryId);
+        return ResponseEntity.ok(subCategories);
     }
 
     @PutMapping("/{id}")
@@ -56,17 +60,19 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "404", description = "Sub-category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own this sub-category")
     })
-    public SubCategory update(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
-        return subCategoryService.editSubCategory(id, request);
+    public ResponseEntity<SubCategory> update(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
+        SubCategory updated = subCategoryService.editSubCategory(id, request);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a sub-category", responses = {
-            @ApiResponse(responseCode = "200", description = "Sub-category deleted"),
+            @ApiResponse(responseCode = "204", description = "Sub-category deleted"),
             @ApiResponse(responseCode = "404", description = "Sub-category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own this sub-category")
     })
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         subCategoryService.deleteSubCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

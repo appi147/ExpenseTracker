@@ -127,21 +127,6 @@ export function AddExpenseModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label>Amount</label>
-            <Input
-              type="text"
-              value={amount}
-              onChange={(e) => {
-                const val = e.target.value.replace(/^0+(?!\.|$)/, "");
-                if (/^\d*\.?\d{0,2}$/.test(val)) {
-                  setAmount(val);
-                }
-              }}
-              required
-            />
-          </div>
-
-          <div>
             <label>Date</label>
             <Popover>
               <PopoverTrigger asChild>
@@ -179,15 +164,6 @@ export function AddExpenseModal({
                 />
               </PopoverContent>
             </Popover>
-          </div>
-
-          <div>
-            <label>Comments</label>
-            <Input
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              placeholder="Optional"
-            />
           </div>
 
           <div>
@@ -237,6 +213,21 @@ export function AddExpenseModal({
           )}
 
           <div>
+            <label>Amount</label>
+            <Input
+              type="text"
+              value={amount}
+              onChange={(e) => {
+                const val = e.target.value.replace(/^0+(?!\.|$)/, "");
+                if (/^\d*\.?\d{0,2}$/.test(val)) {
+                  setAmount(val);
+                }
+              }}
+              required
+            />
+          </div>
+
+          <div>
             <label>Payment Type</label>
             <Select
               value={paymentTypeCode}
@@ -253,6 +244,15 @@ export function AddExpenseModal({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <label>Comments</label>
+            <Input
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Optional"
+            />
           </div>
 
           <DialogFooter>

@@ -51,3 +51,11 @@ export const getFilteredExpenses = async (filters: FilterParams) => {
   const response = await API.get(`/expense/list?${params.toString()}`);
   return response.data;
 };
+
+export const deleteExpense = async (expenseId: number): Promise<void> => {
+  await API.delete(`/expense/${expenseId}`);
+};
+
+export async function updateExpenseAmount(expenseId: number, amount: number) {
+  return API.put(`/expense/${expenseId}/amount`, { amount });
+}

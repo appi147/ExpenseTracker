@@ -1,15 +1,15 @@
 package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.UserContext;
-import com.appi147.expensetracker.entity.Expense;
-import com.appi147.expensetracker.entity.PaymentType;
-import com.appi147.expensetracker.entity.SubCategory;
-import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.entity.*;
+import com.appi147.expensetracker.exception.ForbiddenException;
+import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.CreateExpenseRequest;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.util.ExpenseSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +23,7 @@ import java.time.YearMonth;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
@@ -72,7 +73,32 @@ public class ExpenseService {
         Specification<Expense> spec = ExpenseSpecification.filter(
                 userId, categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo
         );
-        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date", "updatedAt").descending());
         return expenseRepository.findAll(spec, pageable);
+    }
+
+    public void deleteExpense(Long expenseId) {
+        Expense expense = getExpenseIfOwnedByCurrentUser(expenseId);
+        log.info("Deleting expense [{}] by user [{}]", expenseId, expense.getCreatedBy().getUserId());
+        expenseRepository.delete(expense);
+    }
+
+    private Expense getExpenseIfOwnedByCurrentUser(Long expenseId) {
+        User requester = UserContext.getCurrentUser();
+        Expense expense = expenseRepository.findByIdWithCreator(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found with id " + expenseId));
+
+        if (expense.getCreatedBy() == null || !expense.getCreatedBy().getUserId().equals(requester.getUserId())) {
+            log.warn("User [{}] tried to access expense [{}] not owned by them", requester.getUserId(), expenseId);
+            throw new ForbiddenException("You are not allowed to access this resource");
+        }
+
+        return expense;
+    }
+
+    public void updateExpenseAmount(Long expenseId, BigDecimal amount) {
+        Expense expense = getExpenseIfOwnedByCurrentUser(expenseId);
+        expense.setAmount(amount);
+        expenseRepository.saveAndFlush(expense);
     }
 }

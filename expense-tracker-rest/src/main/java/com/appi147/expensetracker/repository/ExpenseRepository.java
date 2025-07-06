@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpecificationExecutor<Expense> {
@@ -48,4 +49,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
             "paymentType"
     })
     Page<Expense> findAll(Specification<Expense> spec, Pageable pageable);
+
+    @Query("SELECT e FROM Expense e JOIN FETCH e.createdBy WHERE e.expenseId = :id")
+    Optional<Expense> findByIdWithCreator(@Param("id") Long id);
 }

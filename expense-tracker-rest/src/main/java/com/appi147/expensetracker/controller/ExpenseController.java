@@ -2,8 +2,12 @@ package com.appi147.expensetracker.controller;
 
 import com.appi147.expensetracker.entity.Expense;
 import com.appi147.expensetracker.model.request.CreateExpenseRequest;
+import com.appi147.expensetracker.model.request.EditExpenseAmount;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
+import com.appi147.expensetracker.model.response.PagedResponse;
 import com.appi147.expensetracker.service.ExpenseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +39,7 @@ public class ExpenseController {
     }
 
     @GetMapping("list")
-    public Page<Expense> getExpenses(
+    public ResponseEntity<PagedResponse<Expense>> getExpenses(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long subCategoryId,
             @RequestParam(required = false) String paymentTypeCode,
@@ -44,6 +48,33 @@ public class ExpenseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return expenseService.getFilteredExpenses(categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo, page, size);
+        Page<Expense> filteredExpenses = expenseService.getFilteredExpenses(categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo, page, size);
+        PagedResponse<Expense> response = new PagedResponse<>(
+                filteredExpenses.getContent(),
+                filteredExpenses.getNumber(),
+                filteredExpenses.getSize(),
+                filteredExpenses.getTotalElements(),
+                filteredExpenses.getTotalPages(),
+                filteredExpenses.isLast()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a expense", responses = {
+            @ApiResponse(responseCode = "204", description = "Expense deleted"),
+            @ApiResponse(responseCode = "404", description = "Expense not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
+        expenseService.deleteExpense(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{expenseId}/amount")
+    public ResponseEntity<Void> updateExpenseAmount(@PathVariable Long expenseId, @RequestBody EditExpenseAmount editExpenseAmount) {
+        expenseService.updateExpenseAmount(expenseId, editExpenseAmount.getAmount());
+        return ResponseEntity.ok().build();
     }
 }

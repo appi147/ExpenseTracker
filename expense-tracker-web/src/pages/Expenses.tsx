@@ -10,14 +10,18 @@ import {
 } from "@/components/ui/select";
 import type { Expense } from "@/components/expenses/types";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { columns } from "@/components/expenses/columns";
-import { getFilteredExpenses } from "@/services/expense-service";
+import { getExpenseColumns } from "@/components/expenses/columns";
+import {
+  getFilteredExpenses,
+  deleteExpense,
+  updateExpenseAmount,
+} from "@/services/expense-service";
 
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
 
   const [filters, setFilters] = useState({
     dateRange: null as { from: string; to: string } | null,
@@ -40,9 +44,32 @@ export default function Expenses() {
     setTotalPages(response.totalPages);
   };
 
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this expense?")) {
+      await deleteExpense(id);
+      fetchExpenses();
+    }
+  };
+
+  const handleEditAmount = async (expense: Expense) => {
+    const newAmount = prompt("Enter new amount", expense.amount.toString());
+    if (newAmount) {
+      const amount = parseFloat(newAmount);
+      if (!isNaN(amount)) {
+        await updateExpenseAmount(expense.expenseId, amount);
+        fetchExpenses();
+      }
+    }
+  };
+
+  const columns = useMemo(
+    () => getExpenseColumns(handleEditAmount, handleDelete),
+    [expenses]
+  );
+
   useEffect(() => {
     fetchExpenses();
-  }, [filters, page]);
+  }, [filters, page, pageSize]);
 
   const categories = useMemo(() => {
     const map = new Map<number, string>();
@@ -155,16 +182,48 @@ export default function Expenses() {
         <div className="text-sm">
           Page {page + 1} of {totalPages}
         </div>
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-muted-foreground">
+            Rows per page:
+          </label>
+          <Select
+            value={pageSize.toString()}
+            onValueChange={(val) => {
+              setPageSize(Number(val));
+              setPage(0);
+            }}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[10, 25, 50, 100].map((size) => (
+                <SelectItem key={size} value={size.toString()}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-x-2">
           <button
-            className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+            className="px-3 py-1 rounded text-sm 
+             bg-gray-100 hover:bg-gray-200 
+             dark:bg-gray-800 dark:hover:bg-gray-700 
+             dark:text-gray-100 text-gray-900 
+             disabled:opacity-50"
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
             disabled={page === 0}
           >
             Prev
           </button>
+
           <button
-            className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+            className="px-3 py-1 rounded text-sm 
+             bg-gray-100 hover:bg-gray-200 
+             dark:bg-gray-800 dark:hover:bg-gray-700 
+             dark:text-gray-100 text-gray-900 
+             disabled:opacity-50"
             onClick={() => setPage((p) => p + 1)}
             disabled={page + 1 >= totalPages}
           >
