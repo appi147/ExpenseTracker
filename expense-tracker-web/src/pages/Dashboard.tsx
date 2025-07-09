@@ -1,11 +1,11 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
+import ToggleDuration from "@/components/insights/ToggleDuration";
 
 const Dashboard = () => {
   const { token } = useAuth();
@@ -58,7 +58,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <div className="p-6 max-w-5xl mx-auto">
         <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
 
@@ -83,14 +82,18 @@ const Dashboard = () => {
             </div>
 
             <div className="flex flex-col gap-2 items-end">
+              {/* Switch component replaces the toggle button */}
+              <ToggleDuration
+                monthly={!showLast30Days}
+                onChange={(val: boolean) => setShowLast30Days(!val)}
+              />
+
               <Button
-                variant="outline"
                 size="sm"
-                onClick={() => setShowLast30Days((prev) => !prev)}
+                onClick={() =>
+                  navigate(`/expenses/insights?monthly=${!showLast30Days}`)
+                }
               >
-                {showLast30Days ? "Show This Month" : "Show Last 30 Days"}
-              </Button>
-              <Button size="sm" onClick={() => navigate("/expenses/list")}>
                 View Details
               </Button>
             </div>

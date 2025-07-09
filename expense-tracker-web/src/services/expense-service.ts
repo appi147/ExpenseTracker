@@ -23,6 +23,22 @@ interface FilterParams {
   size?: number;
 }
 
+export interface SubCategoryWiseExpense {
+  subCategory: string;
+  amount: number;
+}
+
+export interface CategoryWiseExpense {
+  category: string;
+  amount: number;
+  subCategoryWiseExpenses: SubCategoryWiseExpense[];
+}
+
+export interface MonthlyExpenseInsight {
+  categoryWiseExpenses: CategoryWiseExpense[];
+  totalExpense: number;
+}
+
 export const createExpense = async (data: CreateExpenseRequest) => {
   const response = await API.post("/expense/create", data);
   return response.data;
@@ -59,3 +75,14 @@ export const deleteExpense = async (expenseId: number): Promise<void> => {
 export async function updateExpenseAmount(expenseId: number, amount: number) {
   return API.put(`/expense/${expenseId}/amount`, { amount });
 }
+
+/**
+ * Fetches detailed category and sub-category wise expense insights.
+ * @param monthly - true for current month, false for last 30 days
+ */
+export const getMonthlyInsight = async (
+  monthly: boolean = true
+): Promise<MonthlyExpenseInsight> => {
+  const response = await API.get(`/expense/insight?monthly=${monthly}`);
+  return response.data;
+};
