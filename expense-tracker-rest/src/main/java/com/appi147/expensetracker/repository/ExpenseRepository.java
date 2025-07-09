@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,6 +29,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @EntityGraph(attributePaths = {
+            "subCategory",
+            "subCategory.category"
+    })
+    @Query("select e from Expense e where e.date between ?1 and ?2")
+    List<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
     @Query("""
                 SELECT DISTINCT e.subCategory.category.categoryId

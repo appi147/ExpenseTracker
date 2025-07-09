@@ -5,7 +5,10 @@ import com.appi147.expensetracker.entity.*;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.CreateExpenseRequest;
+import com.appi147.expensetracker.model.response.CategoryWiseExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
+import com.appi147.expensetracker.model.response.MonthlyExpenseInsight;
+import com.appi147.expensetracker.model.response.SubCategoryWiseExpense;
 import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.util.ExpenseSpecification;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,4 +107,50 @@ public class ExpenseService {
         expense.setAmount(amount);
         expenseRepository.saveAndFlush(expense);
     }
+
+    public MonthlyExpenseInsight getMonthlyExpenseInsight(boolean monthly) {
+        LocalDate start, end;
+
+        if (monthly) {
+            YearMonth month = YearMonth.now();
+            start = month.atDay(1);
+            end = month.atEndOfMonth();
+        } else {
+            start = LocalDate.now().minusDays(30);
+            end = LocalDate.now();
+        }
+
+        List<Expense> expenseList = expenseRepository.findByDateBetween(start, end);
+
+        List<CategoryWiseExpense> categoryWiseExpenses = expenseList.stream()
+                .collect(Collectors.groupingBy(e -> e.getSubCategory().getCategory().getLabel()))
+                .entrySet()
+                .stream()
+                .map(categoryEntry -> {
+                    String category = categoryEntry.getKey();
+                    Map<String, BigDecimal> subCategorySums = categoryEntry.getValue().stream()
+                            .collect(Collectors.groupingBy(
+                                    e -> e.getSubCategory().getLabel(),
+                                    Collectors.reducing(BigDecimal.ZERO, Expense::getAmount, BigDecimal::add)
+                            ));
+
+                    List<SubCategoryWiseExpense> subCategoryWiseExpenses = subCategorySums.entrySet().stream()
+                            .map(e -> new SubCategoryWiseExpense(e.getKey(), e.getValue()))
+                            .toList();
+
+                    BigDecimal categoryTotal = subCategoryWiseExpenses.stream()
+                            .map(SubCategoryWiseExpense::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    return new CategoryWiseExpense(category, categoryTotal, subCategoryWiseExpenses);
+                })
+                .toList();
+
+        BigDecimal totalAmount = categoryWiseExpenses.stream()
+                .map(CategoryWiseExpense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new MonthlyExpenseInsight(totalAmount, categoryWiseExpenses);
+    }
+
 }
