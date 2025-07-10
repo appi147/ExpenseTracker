@@ -55,3 +55,7 @@ CREATE TABLE expense (
     CONSTRAINT fk_expense_payment_type FOREIGN KEY (payment_type_id) REFERENCES payment_type(id),
     CONSTRAINT fk_expense_sub_category FOREIGN KEY (sub_category_id) REFERENCES sub_category(sub_cat_id)
 );
+
+ALTER TABLE user ADD COLUMN budget NUMERIC(19, 2) DEFAULT 0;
+
+ALTER TABLE user ADD COLUMN preferred_theme VARCHAR(10) NOT NULL DEFAULT 'SYSTEM';
