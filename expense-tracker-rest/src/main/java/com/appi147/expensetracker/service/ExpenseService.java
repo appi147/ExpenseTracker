@@ -109,6 +109,7 @@ public class ExpenseService {
     }
 
     public MonthlyExpenseInsight getMonthlyExpenseInsight(boolean monthly) {
+        User user = UserContext.getCurrentUser();
         LocalDate start, end;
 
         if (monthly) {
@@ -120,7 +121,7 @@ public class ExpenseService {
             end = LocalDate.now();
         }
 
-        List<Expense> expenseList = expenseRepository.findByDateBetween(start, end);
+        List<Expense> expenseList = expenseRepository.findByCreatedByAndDateBetween(user, start, end);
 
         List<CategoryWiseExpense> categoryWiseExpenses = expenseList.stream()
                 .collect(Collectors.groupingBy(e -> e.getSubCategory().getCategory().getLabel()))
@@ -150,7 +151,7 @@ public class ExpenseService {
                 .map(CategoryWiseExpense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new MonthlyExpenseInsight(totalAmount, categoryWiseExpenses);
+        return new MonthlyExpenseInsight(user.getBudget(), totalAmount, categoryWiseExpenses);
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MonthlyExpenseInsight {
 
+    private BigDecimal monthlyBudget;
     private BigDecimal totalExpense;
     List<CategoryWiseExpense> categoryWiseExpenses = new ArrayList<>();
 }

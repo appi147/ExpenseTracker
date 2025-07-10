@@ -1,8 +1,10 @@
 package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.GoogleTokenVerifier;
+import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.UnauthorizedException;
+import com.appi147.expensetracker.model.request.BudgetUpdate;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -64,5 +66,11 @@ public class UserService {
         userRepository.saveAndFlush(user);
 
         return new LoginResponse(user);
+    }
+
+    public LoginResponse updateBudget(BudgetUpdate budgetUpdate) {
+        User requester = UserContext.getCurrentUser();
+        requester.setBudget(budgetUpdate.getAmount());
+        return new LoginResponse(userRepository.saveAndFlush(requester));
     }
 }

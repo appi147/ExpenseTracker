@@ -37,6 +37,7 @@ export interface CategoryWiseExpense {
 export interface MonthlyExpenseInsight {
   categoryWiseExpenses: CategoryWiseExpense[];
   totalExpense: number;
+  monthlyBudget: number;
 }
 
 export const createExpense = async (data: CreateExpenseRequest) => {

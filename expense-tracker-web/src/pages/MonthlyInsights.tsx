@@ -10,7 +10,7 @@ export default function MonthlyInsights() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header with icon */}
+
       <div className="flex items-center justify-center gap-3">
         <BarChart2 className="w-6 h-6 text-primary" />
         <h1 className="text-3xl font-semibold text-center text-foreground">
@@ -18,7 +18,6 @@ export default function MonthlyInsights() {
         </h1>
       </div>
 
-      {/* Optional: wrap insights in a card */}
       <Card>
         <CardContent className="p-6">
           <ExpenseInsight initialMonthly={monthly} />

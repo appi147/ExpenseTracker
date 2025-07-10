@@ -4,6 +4,7 @@ import type { MonthlyExpenseInsight } from "@/services/expense-service";
 import { Card, CardContent } from "@/components/ui/card";
 import ToggleDuration from "./ToggleDuration";
 import CategoryAccordion from "./CategoryAccordion";
+import BudgetProgress from "./BudgetProgress";
 
 type Props = {
   initialMonthly: boolean;
@@ -32,8 +33,11 @@ export default function ExpenseInsight({ initialMonthly }: Props) {
       {!loading && data && (
         <>
           <Card>
-            <CardContent className="p-4 text-xl font-semibold text-center">
-              Total Expense: ₹{data.totalExpense.toFixed(2)}
+            <CardContent className="p-4">
+              <BudgetProgress
+                totalExpense={data.totalExpense}
+                monthlyBudget={data.monthlyBudget}
+              />
             </CardContent>
           </Card>
 

@@ -20,4 +20,9 @@ export const getUserProfile = async () => {
   return response.data;
 };
 
+export async function updateUserSettings(payload: { amount: number }) {
+  const res = await API.put("/user/budget", payload);
+  return res.data;
+}
+
 export default API;

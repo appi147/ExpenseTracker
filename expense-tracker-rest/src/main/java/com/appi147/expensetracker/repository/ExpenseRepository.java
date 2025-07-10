@@ -1,6 +1,7 @@
 package com.appi147.expensetracker.repository;
 
 import com.appi147.expensetracker.entity.Expense;
+import com.appi147.expensetracker.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,8 +35,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
             "subCategory",
             "subCategory.category"
     })
-    @Query("select e from Expense e where e.date between ?1 and ?2")
-    List<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate);
+    @Query("select e from Expense e where e.createdBy = ?1 and e.date between ?2 and ?3")
+    List<Expense> findByCreatedByAndDateBetween(User createdBy, LocalDate dateStart, LocalDate dateEnd);
+
 
     @Query("""
                 SELECT DISTINCT e.subCategory.category.categoryId

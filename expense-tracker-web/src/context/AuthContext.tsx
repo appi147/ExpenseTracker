@@ -6,6 +6,9 @@ interface User {
   fullName: string;
   email: string;
   pictureUrl: string;
+  role: string;
+  budget: number;
+  preferredTheme: string;
 }
 
 interface AuthContextType {

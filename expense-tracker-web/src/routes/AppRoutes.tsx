@@ -2,8 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
-import Profile from "@/pages/Profile";
-import Settings from "@/pages/Settings";
+import Profile from "@/pages/AccountPage";
 import Categories from "@/pages/Categories";
 import Layout from "@/components/Layout";
 import Expenses from "@/pages/Expenses";
@@ -27,14 +26,6 @@ const AppRoutes = () => {
           element={
             <Layout>
               <Profile />
-            </Layout>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <Layout>
-              <Settings />
             </Layout>
           }
         />

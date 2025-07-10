@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -51,16 +51,12 @@ const Navbar = () => {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem asChild>
-                <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <User className="w-4 h-4" />
                   Profile
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link to="/settings" className="flex items-center gap-2 cursor-pointer">
-                  <Settings className="w-4 h-4" />
-                  Preferences
                 </Link>
               </DropdownMenuItem>
 
