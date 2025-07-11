@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'expense-tracker-rest/**'
+      - '.github/workflows/deploy-backend.yml'
 
 permissions:
   contents: read
