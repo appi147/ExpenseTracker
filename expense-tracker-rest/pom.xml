@@ -16,6 +16,22 @@
     <properties>
         <java.version>21</java.version>
     </properties>
+    <developers>
+        <developer>
+            <id>appi147</id>
+            <name>Arpit Choudhary</name>
+            <email>arpitkumar147@gmail.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/appi147/ExpenseTracker.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/appi147/ExpenseTracker.git</developerConnection>
+        <url>https://github.com/appi147/ExpenseTracker</url>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -106,28 +122,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-frontend</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>../expense-tracker-web/dist</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
