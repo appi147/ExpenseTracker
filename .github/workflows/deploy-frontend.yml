@@ -1,0 +1,39 @@
+name: Deploy React Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'expense-tracker-web/**'
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: expense-tracker-web/package-lock.json
+
+      - name: Decode SSH Key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" | base64 -d > ec2_key.pem
+          chmod 400 ec2_key.pem
+
+      - name: Build React App
+        run: |
+          cd expense-tracker-web
+          npm install
+          npm run build
+
+      - name: Deploy React to EC2
+        run: |
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ec2_key.pem" \
+            expense-tracker-web/dist/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/expense-frontend/
