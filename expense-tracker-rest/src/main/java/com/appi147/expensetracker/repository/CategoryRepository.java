@@ -13,5 +13,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c JOIN FETCH c.createdBy WHERE c.categoryId = :id")
     Optional<Category> findByIdWithCreator(@Param("id") Long id);
 
+    @Query("select c from Category c where c.createdBy.userId = ?1 order by c.updatedAt")
     List<Category> findAllByCreatedBy_UserId(String userId);
+
 }

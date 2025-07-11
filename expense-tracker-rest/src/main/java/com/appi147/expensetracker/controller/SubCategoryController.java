@@ -7,6 +7,7 @@ import com.appi147.expensetracker.service.SubCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/sub-category")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "SubCategory", description = "SubCategory-related operations")
 public class SubCategoryController {
     private final SubCategoryService subCategoryService;
 

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -137,6 +138,7 @@ public class ExpenseService {
 
                     List<SubCategoryWiseExpense> subCategoryWiseExpenses = subCategorySums.entrySet().stream()
                             .map(e -> new SubCategoryWiseExpense(e.getKey(), e.getValue()))
+                            .sorted(Comparator.comparing(SubCategoryWiseExpense::getAmount, Comparator.reverseOrder()))
                             .toList();
 
                     BigDecimal categoryTotal = subCategoryWiseExpenses.stream()
@@ -145,6 +147,7 @@ public class ExpenseService {
 
                     return new CategoryWiseExpense(category, categoryTotal, subCategoryWiseExpenses);
                 })
+                .sorted(Comparator.comparing(CategoryWiseExpense::getAmount, Comparator.reverseOrder()))
                 .toList();
 
         BigDecimal totalAmount = categoryWiseExpenses.stream()

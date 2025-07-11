@@ -19,6 +19,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
                 JOIN FETCH s.createdBy
                 JOIN FETCH s.category
                 WHERE s.category.categoryId = :categoryId AND s.createdBy.id = :userId
+                ORDER BY s.updatedAt
             """)
     List<SubCategory> findAllByCategoryIdAndUserId(
             @Param("categoryId") Long categoryId,

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/api/expense")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Expense", description = "Expense-related operations")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
