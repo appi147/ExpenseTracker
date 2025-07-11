@@ -29,7 +29,7 @@ jobs:
 
       - name: Build and Deploy JAR
         run: |
-          mvn -pl expense-tracker-rest clean package
+          mvn -f expense-tracker-rest/pom.xml clean package
           scp -o StrictHostKeyChecking=no -i ec2_key.pem \
             expense-tracker-rest/target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_APP_DIR }}/app.jar
 
