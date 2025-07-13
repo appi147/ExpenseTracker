@@ -1,5 +1,9 @@
 import React from "react";
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import {
+  GoogleLogin,
+  useGoogleOneTapLogin,
+  type CredentialResponse,
+} from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +24,12 @@ const Login: React.FC = () => {
   const handleError = () => {
     console.log("Login Failed");
   };
+
+  useGoogleOneTapLogin({
+    onSuccess: handleSuccess,
+    onError: handleError,
+    cancel_on_tap_outside: false,
+  });
 
   return (
     <div className="flex items-center justify-center min-h-screen w-full bg-background">
