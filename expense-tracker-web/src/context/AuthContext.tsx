@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getToken, setToken, clearToken } from "../utils/auth";
-import { getUserProfile } from "../services/api";
+import { getUserProfile, type ThemeType } from "../services/api";
+import { useTheme } from "@/components/theme-provider";
 
 interface User {
   fullName: string;
@@ -8,7 +9,7 @@ interface User {
   pictureUrl: string;
   role: string;
   budget: number;
-  preferredTheme: string;
+  preferredTheme: ThemeType;
 }
 
 interface AuthContextType {
@@ -43,6 +44,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .catch(() => logout());
     }
   }, [token]);
+
+  const { setTheme } = useTheme();
+
+  useEffect(() => {
+    if (user?.preferredTheme) {
+      setTheme(user.preferredTheme.toLowerCase() as "light" | "dark" | "system");
+    }
+  }, [user?.preferredTheme]);
+
 
   return (
     <AuthContext.Provider value={{ token, setAuthToken, logout, user, setUser }}>

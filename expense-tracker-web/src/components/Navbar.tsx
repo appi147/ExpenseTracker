@@ -11,9 +11,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LogOut, User } from "lucide-react";
+import { updateUserTheme, type ThemeType } from "@/services/api";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
+
+  const handleThemeChange = async (theme: ThemeType) => {
+    try {
+      await updateUserTheme({ theme });
+
+      if (user) {
+        setUser({ ...user, preferredTheme: theme });
+      }
+    } catch (error) {
+      console.error("Failed to update theme:", error);
+    }
+  };
 
   return (
     <nav className="flex justify-between items-center px-6 py-4 border-b bg-background text-foreground">
@@ -22,7 +35,12 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center gap-4">
-        <ModeToggle />
+        {user && (
+          <ModeToggle
+            value={user.preferredTheme}
+            onChange={handleThemeChange}
+          />
+        )}
 
         {user && (
           <DropdownMenu>

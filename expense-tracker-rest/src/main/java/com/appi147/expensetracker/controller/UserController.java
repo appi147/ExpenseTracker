@@ -1,6 +1,7 @@
 package com.appi147.expensetracker.controller;
 
 import com.appi147.expensetracker.model.request.BudgetUpdate;
+import com.appi147.expensetracker.model.request.ThemeUpdate;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,5 +38,12 @@ public class UserController {
     @PutMapping("/budget")
     public ResponseEntity<LoginResponse> updateBudget(@RequestBody BudgetUpdate request) {
         return ResponseEntity.ok(userService.updateBudget(request));
+    }
+
+    @Operation(summary = "Update theme", description = "Updates the user's default theme.")
+    @PutMapping("/theme")
+    public ResponseEntity<Void> updateTheme(@RequestBody ThemeUpdate request) {
+        userService.updateTheme(request);
+        return ResponseEntity.noContent().build();
     }
 }

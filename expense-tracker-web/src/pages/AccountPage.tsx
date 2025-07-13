@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { updateUserSettings } from "@/services/api";
+import { updateBudget } from "@/services/api";
 
 export default function AccountPage() {
   const { user, setUser } = useAuth();
@@ -24,7 +24,7 @@ export default function AccountPage() {
   const handleSave = async () => {
     if (budget === undefined || !user) return;
     try {
-      const updatedUser = await updateUserSettings({ amount: budget });
+      const updatedUser = await updateBudget({ amount: budget });
       setUser(updatedUser);
       setOriginalBudget(budget);
       setEditMode(false);

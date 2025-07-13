@@ -1,5 +1,4 @@
 import { Moon, Sun } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,9 +7,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
+import type { ThemeType } from "@/services/api";
 
-export function ModeToggle() {
+interface ModeToggleProps {
+  value: ThemeType;
+  onChange: (theme: ThemeType) => void;
+}
+
+export function ModeToggle({ value, onChange }: ModeToggleProps) {
   const { setTheme } = useTheme();
+
+  const handleSelect = (theme: ThemeType) => {
+    setTheme(theme.toLowerCase() as "light" | "dark" | "system");
+    onChange(theme);
+  };
 
   return (
     <DropdownMenu>
@@ -22,13 +32,22 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem
+          onClick={() => handleSelect("LIGHT")}
+          className={value === "LIGHT" ? "font-bold" : ""}
+        >
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem
+          onClick={() => handleSelect("DARK")}
+          className={value === "DARK" ? "font-bold" : ""}
+        >
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem
+          onClick={() => handleSelect("SYSTEM")}
+          className={value === "SYSTEM" ? "font-bold" : ""}
+        >
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

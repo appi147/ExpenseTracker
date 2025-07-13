@@ -5,6 +5,7 @@ import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.UnauthorizedException;
 import com.appi147.expensetracker.model.request.BudgetUpdate;
+import com.appi147.expensetracker.model.request.ThemeUpdate;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -72,5 +73,11 @@ public class UserService {
         User requester = UserContext.getCurrentUser();
         requester.setBudget(budgetUpdate.getAmount());
         return new LoginResponse(userRepository.saveAndFlush(requester));
+    }
+
+    public void updateTheme(ThemeUpdate themeUpdate) {
+        User requester = UserContext.getCurrentUser();
+        requester.setPreferredTheme(themeUpdate.getTheme());
+        userRepository.saveAndFlush(requester);
     }
 }
