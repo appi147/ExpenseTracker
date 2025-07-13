@@ -28,11 +28,11 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" | base64 -d > ec2_key.pem
           chmod 400 ec2_key.pem
 
-      - name: Build React App
+      - name: Build React App with VITE_API_URL
         run: |
           cd expense-tracker-web
           npm install
-          npm run build
+          VITE_API_URL=${{ secrets.VITE_API_URL }} npm run build
 
       - name: Deploy React to EC2
         run: |
