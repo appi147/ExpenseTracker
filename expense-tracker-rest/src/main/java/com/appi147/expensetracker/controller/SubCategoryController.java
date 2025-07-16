@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/sub-category")
+@RequestMapping("/sub-category")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "SubCategory", description = "SubCategory-related operations")
 public class SubCategoryController {

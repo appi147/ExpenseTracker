@@ -17,7 +17,7 @@ import java.util.List;
  * Provides endpoints for CRUD operations on PaymentType.
  */
 @RestController
-@RequestMapping("/api/payment-types")
+@RequestMapping("/payment-types")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "PaymentType", description = "PaymentType-related operations")

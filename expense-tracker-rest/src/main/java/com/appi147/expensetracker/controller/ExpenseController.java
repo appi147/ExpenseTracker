@@ -24,7 +24,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/expense")
+@RequestMapping("/expense")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Expense", description = "Expense-related operations")
 public class ExpenseController {
