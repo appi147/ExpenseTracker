@@ -9,37 +9,35 @@ import { updateBudget } from "@/services/api";
 
 export default function AccountPage() {
   const { user, setUser } = useAuth();
-
-  const [budget, setBudget] = useState<number | undefined>();
+  const [budget, setBudget] = useState<number | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
-  const [originalBudget, setOriginalBudget] = useState<number | undefined>();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user?.budget !== undefined) {
       setBudget(user.budget);
-      setOriginalBudget(user.budget);
     }
   }, [user]);
 
   const handleSave = async () => {
-    if (budget === undefined || !user) return;
+    if (budget === undefined || !user || budget === user.budget) {
+      setEditMode(false);
+      return;
+    }
     try {
+      setLoading(true);
       const updatedUser = await updateBudget({ amount: budget });
       setUser(updatedUser);
-      setOriginalBudget(budget);
       setEditMode(false);
     } catch (err) {
       console.error(err);
       alert("Failed to update budget.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    setBudget(originalBudget);
-    setEditMode(false);
-  };
-
-  if (!user) return null;
+  if (!user) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
@@ -68,19 +66,33 @@ export default function AccountPage() {
             <Input
               id="budget"
               type="number"
-              value={budget}
+              value={budget ?? ""}
               onChange={(e) => setBudget(Number(e.target.value))}
-              disabled={!editMode}
+              disabled={!editMode || loading}
+              min={0}
             />
             {editMode ? (
               <div className="flex gap-2">
-                <Button onClick={handleSave}>Save</Button>
-                <Button variant="outline" onClick={handleCancel}>
+                <Button onClick={handleSave} disabled={loading}>
+                  {loading ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setBudget(user.budget);
+                    setEditMode(false);
+                  }}
+                  disabled={loading}
+                >
                   Cancel
                 </Button>
               </div>
             ) : (
-              <Button variant="outline" onClick={() => setEditMode(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setEditMode(true)}
+                disabled={loading}
+              >
                 Edit Budget
               </Button>
             )}

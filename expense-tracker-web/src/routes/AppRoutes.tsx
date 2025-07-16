@@ -7,65 +7,81 @@ import Categories from "@/pages/Categories";
 import Layout from "@/components/Layout";
 import Expenses from "@/pages/Expenses";
 import MonthlyInsights from "@/pages/MonthlyInsights";
+import SiteWideInsights from "@/pages/SiteWideInsights";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
     <main className="min-h-screen w-full bg-background">
       <Routes>
         <Route path="/login" element={<Login />} />
+
         <Route
           path="/"
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <Layout>
-              <Profile />
-            </Layout>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <Layout>
-              <NotFound />
-            </Layout>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Profile />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/categories"
           element={
-            <Layout>
-              <Categories />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Categories />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/expenses/list"
           element={
-            <Layout>
-              <Expenses />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Expenses />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/expenses/insights"
           element={
+            <ProtectedRoute>
+              <Layout>
+                <MonthlyInsights />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <SiteWideInsights />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={
             <Layout>
-              <MonthlyInsights />
+              <NotFound />
             </Layout>
           }
         />

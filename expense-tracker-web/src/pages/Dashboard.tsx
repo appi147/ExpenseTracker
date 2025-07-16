@@ -1,6 +1,5 @@
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
@@ -8,7 +7,6 @@ import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
 import ToggleDuration from "@/components/insights/ToggleDuration";
 
 const Dashboard = () => {
-  const { token } = useAuth();
   const navigate = useNavigate();
   const [monthlyTotal, setMonthlyTotal] = useState<number | null>(null);
   const [last30DaysTotal, setLast30DaysTotal] = useState<number | null>(null);
@@ -26,12 +24,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
     loadExpenses();
-  }, [token]);
+  }, []);
 
   const options = [
     {
@@ -82,12 +76,10 @@ const Dashboard = () => {
             </div>
 
             <div className="flex flex-col gap-2 items-end">
-              {/* Switch component replaces the toggle button */}
               <ToggleDuration
                 monthly={!showLast30Days}
                 onChange={(val: boolean) => setShowLast30Days(!val)}
               />
-
               <Button
                 size="sm"
                 onClick={() =>

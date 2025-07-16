@@ -28,9 +28,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/login").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/user/login", "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/expense/**", "/user/**", "/category/**", "/sub-category/**", "/payment-types/**", "/insights/**").authenticated()
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(new GoogleTokenAuthenticationFilter(userService),
                         UsernamePasswordAuthenticationFilter.class);

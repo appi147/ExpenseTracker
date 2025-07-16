@@ -46,6 +46,9 @@ public class GoogleTokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.equals("/api/user/login") || !path.startsWith("/api/");
+        return path.equals("/api/user/login") ||
+                path.startsWith("/api/actuator") ||
+                path.startsWith("/api/swagger-ui") ||
+                path.startsWith("/api/v3/api-docs");
     }
 }

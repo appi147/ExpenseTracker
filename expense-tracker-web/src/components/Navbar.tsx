@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, BarChartBig } from "lucide-react";
 import { updateUserTheme, type ThemeType } from "@/services/api";
 
 const Navbar = () => {
@@ -19,7 +19,6 @@ const Navbar = () => {
   const handleThemeChange = async (theme: ThemeType) => {
     try {
       await updateUserTheme({ theme });
-
       if (user) {
         setUser({ ...user, preferredTheme: theme });
       }
@@ -79,6 +78,21 @@ const Navbar = () => {
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
+
+              {user.role === "SUPER_USER" && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/insights"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <BarChartBig className="w-4 h-4" />
+                      Site Insights
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
 
               <DropdownMenuItem
                 onClick={logout}
