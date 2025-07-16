@@ -12,13 +12,13 @@ import java.time.Duration;
 public class CacheConfig {
 
     @Bean
-    public CacheManager hourly() {
+    public CacheManager cacheManager() {
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 .maximumSize(100)
                 .expireAfterWrite(Duration.ofHours(1))
                 .recordStats();
 
-        CaffeineCacheManager manager = new CaffeineCacheManager("paymentTypes", "categories", "subCategories");
+        CaffeineCacheManager manager = new CaffeineCacheManager("paymentTypes", "categories", "subCategories", "siteWideInsight");
         manager.setCaffeine(caffeine);
         return manager;
     }

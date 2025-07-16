@@ -1,4 +1,4 @@
-package com.appi147.expensetracker.util;
+package com.appi147.expensetracker.spec;
 
 import com.appi147.expensetracker.entity.Expense;
 import jakarta.persistence.criteria.Predicate;

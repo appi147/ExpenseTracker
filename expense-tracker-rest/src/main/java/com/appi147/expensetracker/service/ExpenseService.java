@@ -10,7 +10,7 @@ import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpenseInsight;
 import com.appi147.expensetracker.model.response.SubCategoryWiseExpense;
 import com.appi147.expensetracker.repository.ExpenseRepository;
-import com.appi147.expensetracker.util.ExpenseSpecification;
+import com.appi147.expensetracker.spec.ExpenseSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
