@@ -2,11 +2,7 @@ import * as React from "react";
 import { DateRange } from "react-date-range";
 import { format, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 
 import "react-date-range/dist/styles.css";
@@ -23,11 +19,7 @@ interface DateRangePickerProps {
   className?: string;
 }
 
-export function DateRangePicker({
-  value,
-  onChange,
-  className,
-}: DateRangePickerProps) {
+export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const selectionRange = {
@@ -47,7 +39,7 @@ export function DateRangePicker({
           {value?.from && value?.to ? (
             `${format(parseISO(value.from), "dd MMM yyyy")} - ${format(
               parseISO(value.to),
-              "dd MMM yyyy"
+              "dd MMM yyyy",
             )}`
           ) : (
             <span>Pick a date range</span>

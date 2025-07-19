@@ -18,9 +18,7 @@ export default function CategoryAccordion({ data }: Props) {
           <AccordionTrigger className="no-underline hover:no-underline focus:no-underline cursor-pointer">
             <div className="flex justify-between w-full">
               <span>{cat.category}</span>
-              <span className="font-medium text-muted-foreground">
-                ₹{cat.amount.toFixed(2)}
-              </span>
+              <span className="font-medium text-muted-foreground">₹{cat.amount.toFixed(2)}</span>
             </div>
           </AccordionTrigger>
           <AccordionContent>
@@ -28,9 +26,7 @@ export default function CategoryAccordion({ data }: Props) {
               {cat.subCategoryWiseExpenses.map((sub) => (
                 <li key={sub.subCategory} className="flex justify-between">
                   <span>{sub.subCategory}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ₹{sub.amount.toFixed(2)}
-                  </span>
+                  <span className="text-sm text-muted-foreground">₹{sub.amount.toFixed(2)}</span>
                 </li>
               ))}
             </ul>

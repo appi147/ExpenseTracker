@@ -62,10 +62,7 @@ export default function Expenses() {
     }
   };
 
-  const columns = useMemo(
-    () => getExpenseColumns(handleEditAmount, handleDelete),
-    [expenses]
-  );
+  const columns = useMemo(() => getExpenseColumns(handleEditAmount, handleDelete), [expenses]);
 
   useEffect(() => {
     fetchExpenses();
@@ -74,16 +71,14 @@ export default function Expenses() {
   const categories = useMemo(() => {
     const map = new Map<number, string>();
     expenses.forEach((e) =>
-      map.set(e.subCategory.category.categoryId, e.subCategory.category.label)
+      map.set(e.subCategory.category.categoryId, e.subCategory.category.label),
     );
     return Array.from(map.entries());
   }, [expenses]);
 
   const subCategories = useMemo(() => {
     const map = new Map<number, string>();
-    expenses.forEach((e) =>
-      map.set(e.subCategory.subCategoryId, e.subCategory.label)
-    );
+    expenses.forEach((e) => map.set(e.subCategory.subCategoryId, e.subCategory.label));
     return Array.from(map.entries());
   }, [expenses]);
 
@@ -99,17 +94,13 @@ export default function Expenses() {
         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4">
           <DateRangePicker
             value={filters.dateRange}
-            onChange={(range) =>
-              setFilters((prev) => ({ ...prev, dateRange: range }))
-            }
+            onChange={(range) => setFilters((prev) => ({ ...prev, dateRange: range }))}
             className="col-span-1 md:col-span-2"
           />
 
           <Select
             value={filters.categoryId?.toString() ?? ""}
-            onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, categoryId: Number(val) }))
-            }
+            onValueChange={(val) => setFilters((prev) => ({ ...prev, categoryId: Number(val) }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Category" />
@@ -125,9 +116,7 @@ export default function Expenses() {
 
           <Select
             value={filters.subCategoryId?.toString() ?? ""}
-            onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, subCategoryId: Number(val) }))
-            }
+            onValueChange={(val) => setFilters((prev) => ({ ...prev, subCategoryId: Number(val) }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Subcategory" />
@@ -143,9 +132,7 @@ export default function Expenses() {
 
           <Select
             value={filters.paymentTypeCode}
-            onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, paymentTypeCode: val }))
-            }
+            onValueChange={(val) => setFilters((prev) => ({ ...prev, paymentTypeCode: val }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Payment Type" />
@@ -183,9 +170,7 @@ export default function Expenses() {
           Page {page + 1} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
-          <label className="text-sm text-muted-foreground">
-            Rows per page:
-          </label>
+          <label className="text-sm text-muted-foreground">Rows per page:</label>
           <Select
             value={pageSize.toString()}
             onValueChange={(val) => {

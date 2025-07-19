@@ -18,11 +18,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
-      includeAssets: [
-        "favicon.ico",
-        "apple-touch-icon-180x180.png",
-        "maskable-icon-512x512.png",
-      ],
+      includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png", "maskable-icon-512x512.png"],
       manifest: {
         name: "Personal Expense Tracker",
         short_name: "ExpenseTracker",

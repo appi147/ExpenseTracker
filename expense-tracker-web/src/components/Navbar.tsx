@@ -34,12 +34,7 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center gap-4">
-        {user && (
-          <ModeToggle
-            value={user.preferredTheme}
-            onChange={handleThemeChange}
-          />
-        )}
+        {user && <ModeToggle value={user.preferredTheme} onChange={handleThemeChange} />}
 
         {user && (
           <DropdownMenu>
@@ -60,18 +55,13 @@ const Navbar = () => {
               <DropdownMenuLabel className="font-medium leading-tight">
                 {user.fullName}
                 <br />
-                <span className="text-xs text-muted-foreground">
-                  {user.email}
-                </span>
+                <span className="text-xs text-muted-foreground">{user.email}</span>
               </DropdownMenuLabel>
 
               <DropdownMenuSeparator />
 
               <DropdownMenuItem asChild>
-                <Link
-                  to="/profile"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+                <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
                   <User className="w-4 h-4" />
                   Profile
                 </Link>
@@ -82,10 +72,7 @@ const Navbar = () => {
               {user.role === "SUPER_USER" && (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link
-                      to="/insights"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
+                    <Link to="/insights" className="flex items-center gap-2 cursor-pointer">
                       <BarChartBig className="w-4 h-4" />
                       Site Insights
                     </Link>

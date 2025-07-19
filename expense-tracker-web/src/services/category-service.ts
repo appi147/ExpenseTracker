@@ -11,16 +11,14 @@ export const getAllCategories = async (): Promise<Category[]> => {
   return response.data;
 };
 
-export const createCategory = async (payload: {
-  label: string;
-}): Promise<Category> => {
+export const createCategory = async (payload: { label: string }): Promise<Category> => {
   const response = await API.post("/category/create", payload);
   return response.data;
 };
 
 export const updateCategory = async (
   categoryId: number,
-  payload: { label: string }
+  payload: { label: string },
 ): Promise<Category> => {
   const response = await API.put(`/category/${categoryId}`, payload);
   return response.data;

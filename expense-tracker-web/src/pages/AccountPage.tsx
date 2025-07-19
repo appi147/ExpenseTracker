@@ -88,11 +88,7 @@ export default function AccountPage() {
                 </Button>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                onClick={() => setEditMode(true)}
-                disabled={loading}
-              >
+              <Button variant="outline" onClick={() => setEditMode(true)} disabled={loading}>
                 Edit Budget
               </Button>
             )}

@@ -34,10 +34,7 @@ export default function ExpenseInsight({ initialMonthly }: Props) {
         <>
           <Card>
             <CardContent className="p-4">
-              <BudgetProgress
-                totalExpense={data.totalExpense}
-                monthlyBudget={data.monthlyBudget}
-              />
+              <BudgetProgress totalExpense={data.totalExpense} monthlyBudget={data.monthlyBudget} />
             </CardContent>
           </Card>
 

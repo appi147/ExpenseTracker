@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  GoogleLogin,
-  useGoogleOneTapLogin,
-  type CredentialResponse,
-} from "@react-oauth/google";
+import { GoogleLogin, useGoogleOneTapLogin, type CredentialResponse } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

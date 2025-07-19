@@ -59,9 +59,7 @@ const Dashboard = () => {
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-sm">
-                {showLast30Days
-                  ? "Last 30 Days Total Expense"
-                  : "This Month’s Total Expense"}
+                {showLast30Days ? "Last 30 Days Total Expense" : "This Month’s Total Expense"}
               </p>
               <h3 className="text-2xl font-bold">
                 ₹
@@ -70,8 +68,8 @@ const Dashboard = () => {
                     ? last30DaysTotal.toFixed(2)
                     : "Loading..."
                   : monthlyTotal !== null
-                  ? monthlyTotal.toFixed(2)
-                  : "Loading..."}
+                    ? monthlyTotal.toFixed(2)
+                    : "Loading..."}
               </h3>
             </div>
 
@@ -82,9 +80,7 @@ const Dashboard = () => {
               />
               <Button
                 size="sm"
-                onClick={() =>
-                  navigate(`/expenses/insights?monthly=${!showLast30Days}`)
-                }
+                onClick={() => navigate(`/expenses/insights?monthly=${!showLast30Days}`)}
               >
                 View Details
               </Button>
@@ -97,9 +93,7 @@ const Dashboard = () => {
             <Card key={opt.label} className="hover:shadow-md transition">
               <CardContent className="p-4">
                 <h3 className="text-lg font-semibold">{opt.label}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {opt.description}
-                </p>
+                <p className="text-sm text-muted-foreground">{opt.description}</p>
                 <Button onClick={opt.onClick} className="mt-3">
                   Go
                 </Button>

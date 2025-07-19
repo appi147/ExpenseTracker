@@ -1,18 +1,10 @@
 import { useState } from "react";
-import {
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
+import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus, FolderIcon } from "lucide-react";
 import { toast } from "sonner";
-import {
-  deleteCategory,
-  updateCategory,
-  type Category,
-} from "@/services/category-service";
+import { deleteCategory, updateCategory, type Category } from "@/services/category-service";
 import {
   getAllSubCategories,
   createSubCategory,
@@ -33,9 +25,7 @@ interface Props {
 }
 
 export default function CategoryItem({ category, reloadCategories }: Props) {
-  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
-    null
-  );
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
   const [editingLabel, setEditingLabel] = useState(category.label);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [newSubLabel, setNewSubLabel] = useState("");
@@ -130,11 +120,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
               <Button size="sm" onClick={handleCategoryUpdate}>
                 Save
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditingCategoryId(null)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setEditingCategoryId(null)}>
                 Cancel
               </Button>
             </>

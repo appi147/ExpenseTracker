@@ -53,12 +53,9 @@ export const getMonthlyExpense = async (): Promise<MonthlyExpense> => {
 export const getFilteredExpenses = async (filters: FilterParams) => {
   const params = new URLSearchParams();
 
-  if (filters.categoryId)
-    params.append("categoryId", String(filters.categoryId));
-  if (filters.subCategoryId)
-    params.append("subCategoryId", String(filters.subCategoryId));
-  if (filters.paymentTypeCode)
-    params.append("paymentTypeCode", filters.paymentTypeCode);
+  if (filters.categoryId) params.append("categoryId", String(filters.categoryId));
+  if (filters.subCategoryId) params.append("subCategoryId", String(filters.subCategoryId));
+  if (filters.paymentTypeCode) params.append("paymentTypeCode", filters.paymentTypeCode);
   if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
   if (filters.dateTo) params.append("dateTo", filters.dateTo);
 
@@ -82,7 +79,7 @@ export async function updateExpenseAmount(expenseId: number, amount: number) {
  * @param monthly - true for current month, false for last 30 days
  */
 export const getMonthlyInsight = async (
-  monthly: boolean = true
+  monthly: boolean = true,
 ): Promise<MonthlyExpenseInsight> => {
   const response = await API.get(`/expense/insight?monthly=${monthly}`);
   return response.data;

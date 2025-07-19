@@ -49,16 +49,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (user?.preferredTheme) {
-      setTheme(
-        user.preferredTheme.toLowerCase() as "light" | "dark" | "system"
-      );
+      setTheme(user.preferredTheme.toLowerCase() as "light" | "dark" | "system");
     }
   }, [user?.preferredTheme]);
 
   return (
-    <AuthContext.Provider
-      value={{ token, setAuthToken, logout, user, setUser }}
-    >
+    <AuthContext.Provider value={{ token, setAuthToken, logout, user, setUser }}>
       {children}
     </AuthContext.Provider>
   );

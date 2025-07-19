@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getAllCategories,
-  createCategory,
-  type Category,
-} from "@/services/category-service";
+import { getAllCategories, createCategory, type Category } from "@/services/category-service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -54,11 +50,7 @@ export default function CategoriesPage() {
 
           <Accordion type="single" collapsible>
             {categories.map((cat) => (
-              <CategoryItem
-                key={cat.categoryId}
-                category={cat}
-                reloadCategories={loadData}
-              />
+              <CategoryItem key={cat.categoryId} category={cat} reloadCategories={loadData} />
             ))}
           </Accordion>
         </CardContent>

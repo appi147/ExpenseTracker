@@ -26,9 +26,7 @@ const PRETTY_COLORS = [
   "#94A3B8", // Slate
 ] as const;
 
-export function createCategoryColorMap(
-  categories: string[]
-): Record<string, string> {
+export function createCategoryColorMap(categories: string[]): Record<string, string> {
   const colorMap: Record<string, string> = {};
   categories.forEach((cat, i) => {
     colorMap[cat] = PRETTY_COLORS[i % PRETTY_COLORS.length];

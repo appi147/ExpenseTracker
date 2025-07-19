@@ -1,18 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import {
-  getMonthlyTrends,
-  type MonthlyTrendRow,
-} from "@/services/insight-service";
+import { getMonthlyTrends, type MonthlyTrendRow } from "@/services/insight-service";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { createCategoryColorMap } from "@/utils/colors";
 import { CustomTooltip } from "@/components/trends/CustomTooltip";
 import { Button } from "@/components/ui/button";
@@ -28,16 +17,19 @@ export default function MonthlyExpenseTrends() {
   }, []);
 
   const allCategories = Array.from(
-    new Set(data.flatMap((row) => Object.keys(row.categoryAmounts)))
+    new Set(data.flatMap((row) => Object.keys(row.categoryAmounts))),
   );
 
   const colorMap = createCategoryColorMap(allCategories);
 
   const chartData = data.map((row) => {
-    const filled = allCategories.reduce((acc, cat) => {
-      acc[cat] = row.categoryAmounts[cat] ?? 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const filled = allCategories.reduce(
+      (acc, cat) => {
+        acc[cat] = row.categoryAmounts[cat] ?? 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
     return {
       month: row.month,
       ...filled,
@@ -106,16 +98,10 @@ export default function MonthlyExpenseTrends() {
       <CardContent>
         <div ref={chartRef}>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart
-              data={chartData}
-              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-            >
+            <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ stroke: "#ccc", strokeWidth: 1 }}
-              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#ccc", strokeWidth: 1 }} />
               <Legend content={renderLegend} />
               {allCategories.map((cat) => (
                 <Line

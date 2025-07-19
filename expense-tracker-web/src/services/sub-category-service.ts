@@ -6,9 +6,7 @@ export interface SubCategory {
   deletable: boolean;
 }
 
-export const getAllSubCategories = async (
-  categoryId: number
-): Promise<SubCategory[]> => {
+export const getAllSubCategories = async (categoryId: number): Promise<SubCategory[]> => {
   const response = await API.get("/sub-category", {
     params: { categoryId },
   });
@@ -25,14 +23,12 @@ export const createSubCategory = async (payload: {
 
 export const updateSubCategory = async (
   subCategoryId: number,
-  payload: { label: string }
+  payload: { label: string },
 ): Promise<SubCategory> => {
   const response = await API.put(`/sub-category/${subCategoryId}`, payload);
   return response.data;
 };
 
-export const deleteSubCategory = async (
-  subCategoryId: number
-): Promise<void> => {
+export const deleteSubCategory = async (subCategoryId: number): Promise<void> => {
   await API.delete(`/sub-category/${subCategoryId}`);
 };

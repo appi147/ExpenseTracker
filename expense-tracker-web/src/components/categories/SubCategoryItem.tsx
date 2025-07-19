@@ -14,11 +14,7 @@ interface SubCategoryItemProps {
   onDelete: (subId: number) => void;
 }
 
-export default function SubCategoryItem({
-  sub,
-  onUpdate,
-  onDelete,
-}: SubCategoryItemProps) {
+export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategoryItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(sub.label);
 
@@ -51,10 +47,7 @@ export default function SubCategoryItem({
             <span>{sub.label}</span>
           </div>
           <div className="flex gap-2 items-center">
-            <Pencil
-              className="w-4 h-4 cursor-pointer"
-              onClick={() => setIsEditing(true)}
-            />
+            <Pencil className="w-4 h-4 cursor-pointer" onClick={() => setIsEditing(true)} />
             {sub.deletable ? (
               <Trash2
                 className="w-4 h-4 text-destructive cursor-pointer"

@@ -38,9 +38,7 @@ const SiteWideInsights: React.FC = () => {
           {insights.map(({ label, value }) => (
             <Card key={label} className="rounded-2xl shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base text-muted-foreground">
-                  {label}
-                </CardTitle>
+                <CardTitle className="text-base text-muted-foreground">{label}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">{value}</p>

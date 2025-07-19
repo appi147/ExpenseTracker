@@ -18,23 +18,13 @@ import {
 import { toast } from "sonner";
 
 import { createExpense } from "@/services/expense-service";
-import {
-  getAllPaymentTypes,
-  type PaymentType,
-} from "@/services/payment-type-service";
+import { getAllPaymentTypes, type PaymentType } from "@/services/payment-type-service";
 import { getAllCategories, type Category } from "@/services/category-service";
-import {
-  getAllSubCategories,
-  type SubCategory,
-} from "@/services/sub-category-service";
+import { getAllSubCategories, type SubCategory } from "@/services/sub-category-service";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 
 interface AddExpenseModalProps {
@@ -43,18 +33,12 @@ interface AddExpenseModalProps {
   onExpenseAdded: () => void;
 }
 
-export function AddExpenseModal({
-  isOpen,
-  onClose,
-  onExpenseAdded,
-}: AddExpenseModalProps) {
+export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseModalProps) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [comments, setComments] = useState("");
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-  const [subCategoryId, setSubCategoryId] = useState<number | undefined>(
-    undefined
-  );
+  const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined);
   const [paymentTypeCode, setPaymentTypeCode] = useState("");
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -134,14 +118,10 @@ export function AddExpenseModal({
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
+                    !date && "text-muted-foreground",
                   )}
                 >
-                  {date ? (
-                    format(new Date(date), "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
+                  {date ? format(new Date(date), "PPP") : <span>Pick a date</span>}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -153,10 +133,7 @@ export function AddExpenseModal({
                     if (!selected) return;
 
                     const year = selected.getFullYear();
-                    const month = String(selected.getMonth() + 1).padStart(
-                      2,
-                      "0"
-                    );
+                    const month = String(selected.getMonth() + 1).padStart(2, "0");
                     const day = String(selected.getDate()).padStart(2, "0");
                     setDate(`${year}-${month}-${day}`);
                   }}
@@ -177,10 +154,7 @@ export function AddExpenseModal({
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
-                  <SelectItem
-                    key={cat.categoryId}
-                    value={cat.categoryId.toString()}
-                  >
+                  <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                     {cat.label}
                   </SelectItem>
                 ))}
@@ -200,10 +174,7 @@ export function AddExpenseModal({
                 </SelectTrigger>
                 <SelectContent>
                   {subCategories.map((sub) => (
-                    <SelectItem
-                      key={sub.subCategoryId}
-                      value={sub.subCategoryId.toString()}
-                    >
+                    <SelectItem key={sub.subCategoryId} value={sub.subCategoryId.toString()}>
                       {sub.label}
                     </SelectItem>
                   ))}
@@ -229,10 +200,7 @@ export function AddExpenseModal({
 
           <div>
             <label>Payment Type</label>
-            <Select
-              value={paymentTypeCode}
-              onValueChange={(val) => setPaymentTypeCode(val)}
-            >
+            <Select value={paymentTypeCode} onValueChange={(val) => setPaymentTypeCode(val)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a payment method" />
               </SelectTrigger>

@@ -9,8 +9,7 @@ export default function BudgetProgress({ totalExpense, monthlyBudget }: Props) {
   const safeExpense = totalExpense ?? 0;
   const safeBudget = monthlyBudget ?? 0;
 
-  const percentUsed =
-    safeBudget > 0 ? Math.min((safeExpense / safeBudget) * 100, 100) : 0;
+  const percentUsed = safeBudget > 0 ? Math.min((safeExpense / safeBudget) * 100, 100) : 0;
   const overBudget = safeBudget > 0 && safeExpense > safeBudget;
   const remaining = safeBudget - safeExpense;
 
@@ -28,10 +27,7 @@ export default function BudgetProgress({ totalExpense, monthlyBudget }: Props) {
         <span>₹{Math.abs(remaining).toFixed(2)}</span>
       </div>
 
-      <Progress
-        value={percentUsed}
-        indicatorColor={overBudget ? "bg-red-500" : "bg-green-500"}
-      />
+      <Progress value={percentUsed} indicatorColor={overBudget ? "bg-red-500" : "bg-green-500"} />
 
       <p className="text-center text-xs text-muted-foreground">
         {safeBudget > 0

@@ -4,13 +4,12 @@ import { Pencil, X } from "lucide-react";
 
 export const getExpenseColumns = (
   handleEditAmount: (expense: Expense) => void,
-  handleDelete: (id: number) => void
+  handleDelete: (id: number) => void,
 ): ColumnDef<Expense>[] => [
   {
     accessorKey: "date",
     header: "Date",
-    cell: ({ row }) =>
-      new Date(row.original.date).toLocaleDateString("en-IN"),
+    cell: ({ row }) => new Date(row.original.date).toLocaleDateString("en-IN"),
   },
   {
     accessorKey: "category",
