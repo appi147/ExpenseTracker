@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -23,14 +23,21 @@ export default function Expenses() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const [filters, setFilters] = useState({
-    dateRange: null as { from: string; to: string } | null,
-    categoryId: null as number | null,
-    subCategoryId: null as number | null,
+  type Filters = {
+    dateRange: { from: string; to: string } | null;
+    categoryId: number | null;
+    subCategoryId: number | null;
+    paymentTypeCode: string;
+  };
+
+  const [filters, setFilters] = useState<Filters>({
+    dateRange: null,
+    categoryId: null,
+    subCategoryId: null,
     paymentTypeCode: "",
   });
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     const response = await getFilteredExpenses({
       categoryId: filters.categoryId ?? undefined,
       subCategoryId: filters.subCategoryId ?? undefined,
@@ -42,31 +49,44 @@ export default function Expenses() {
     });
     setExpenses(response.content);
     setTotalPages(response.totalPages);
-  };
+  }, [filters, page, pageSize]);
 
-  const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this expense?")) {
-      await deleteExpense(id);
-      fetchExpenses();
-    }
-  };
-
-  const handleEditAmount = async (expense: Expense) => {
-    const newAmount = prompt("Enter new amount", expense.amount.toString());
-    if (newAmount) {
-      const amount = parseFloat(newAmount);
-      if (!isNaN(amount)) {
-        await updateExpenseAmount(expense.expenseId, amount);
+  const handleDelete = useCallback(
+    async (id: number) => {
+      if (confirm("Are you sure you want to delete this expense?")) {
+        await deleteExpense(id);
         fetchExpenses();
       }
-    }
-  };
+    },
+    [fetchExpenses],
+  );
 
-  const columns = useMemo(() => getExpenseColumns(handleEditAmount, handleDelete), [expenses]);
+  const handleEditAmount = useCallback(
+    async (expense: Expense) => {
+      const newAmount = prompt("Enter new amount", expense.amount.toString());
+      if (newAmount) {
+        const amount = parseFloat(newAmount);
+        if (!isNaN(amount)) {
+          await updateExpenseAmount(expense.expenseId, amount);
+          fetchExpenses();
+        }
+      }
+    },
+    [fetchExpenses],
+  );
+
+  const columns = useMemo(
+    () => getExpenseColumns(handleEditAmount, handleDelete),
+    [handleEditAmount, handleDelete],
+  );
 
   useEffect(() => {
     fetchExpenses();
-  }, [filters, page, pageSize]);
+  }, [filters, page, pageSize, fetchExpenses]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filters, pageSize]);
 
   const categories = useMemo(() => {
     const map = new Map<number, string>();
@@ -100,7 +120,9 @@ export default function Expenses() {
 
           <Select
             value={filters.categoryId?.toString() ?? ""}
-            onValueChange={(val) => setFilters((prev) => ({ ...prev, categoryId: Number(val) }))}
+            onValueChange={(val) =>
+              setFilters((prev) => ({ ...prev, categoryId: val === "" ? null : Number(val) }))
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Category" />
@@ -116,7 +138,9 @@ export default function Expenses() {
 
           <Select
             value={filters.subCategoryId?.toString() ?? ""}
-            onValueChange={(val) => setFilters((prev) => ({ ...prev, subCategoryId: Number(val) }))}
+            onValueChange={(val) =>
+              setFilters((prev) => ({ ...prev, subCategoryId: val === "" ? null : Number(val) }))
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Subcategory" />
@@ -163,7 +187,11 @@ export default function Expenses() {
         </CardContent>
       </Card>
 
-      <DataTable columns={columns} data={expenses} />
+      {expenses.length === 0 ? (
+        <div className="text-center text-muted-foreground py-10">No expenses found.</div>
+      ) : (
+        <DataTable columns={columns} data={expenses} />
+      )}
 
       <div className="flex justify-between items-center py-2 px-4">
         <div className="text-sm">
@@ -198,7 +226,7 @@ export default function Expenses() {
              dark:text-gray-100 text-gray-900 
              disabled:opacity-50"
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
-            disabled={page === 0}
+            disabled={page <= 0}
           >
             Prev
           </button>
@@ -210,7 +238,7 @@ export default function Expenses() {
              dark:text-gray-100 text-gray-900 
              disabled:opacity-50"
             onClick={() => setPage((p) => p + 1)}
-            disabled={page + 1 >= totalPages}
+            disabled={expenses.length < pageSize}
           >
             Next
           </button>

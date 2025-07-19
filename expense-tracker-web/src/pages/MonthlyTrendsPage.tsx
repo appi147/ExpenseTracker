@@ -2,10 +2,15 @@ import { useEffect, useState, useRef } from "react";
 import { getMonthlyTrends, type MonthlyTrendRow } from "@/services/insight-service";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import type { LegendPayload } from "recharts";
 import { createCategoryColorMap } from "@/utils/colors";
 import { CustomTooltip } from "@/components/trends/CustomTooltip";
 import { Button } from "@/components/ui/button";
 import { toPng } from "html-to-image";
+
+type CustomLegendProps = {
+  payload?: readonly LegendPayload[];
+};
 
 export default function MonthlyExpenseTrends() {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -36,21 +41,22 @@ export default function MonthlyExpenseTrends() {
     };
   });
 
-  const handleLegendClick = (e: any) => {
+  const handleLegendClick = (e: { dataKey: string }) => {
     const { dataKey } = e;
     setHiddenLines((prev) => ({ ...prev, [dataKey]: !prev[dataKey] }));
   };
 
-  const renderLegend = (props: any) => {
-    const { payload } = props;
+  const renderLegend = ({ payload }: CustomLegendProps) => {
     return (
       <div className="flex flex-wrap justify-center items-center gap-4 mt-2">
-        {payload.map((entry: any) => {
-          const isHidden = hiddenLines[entry.value];
+        {payload?.map((entry) => {
+          const key = entry.value as string;
+          const isHidden = hiddenLines[key];
+
           return (
             <span
-              key={entry.value}
-              onClick={() => handleLegendClick({ dataKey: entry.value })}
+              key={key}
+              onClick={() => handleLegendClick({ dataKey: key })}
               className={`cursor-pointer text-sm flex items-center gap-1 px-2 py-1 rounded ${
                 isHidden ? "line-through opacity-50" : "font-medium"
               }`}
@@ -59,7 +65,7 @@ export default function MonthlyExpenseTrends() {
                 className="inline-block w-3 h-3 rounded-full border"
                 style={{ backgroundColor: entry.color }}
               />
-              {entry.value}
+              {key}
             </span>
           );
         })}

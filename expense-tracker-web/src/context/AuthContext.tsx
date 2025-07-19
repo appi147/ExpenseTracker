@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (user?.preferredTheme) {
       setTheme(user.preferredTheme.toLowerCase() as "light" | "dark" | "system");
     }
-  }, [user?.preferredTheme]);
+  }, [user?.preferredTheme, setTheme]);
 
   return (
     <AuthContext.Provider value={{ token, setAuthToken, logout, user, setUser }}>
