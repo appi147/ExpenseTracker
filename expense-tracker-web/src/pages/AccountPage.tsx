@@ -65,11 +65,19 @@ export default function AccountPage() {
             <Label htmlFor="budget">Monthly Budget</Label>
             <Input
               id="budget"
-              type="number"
-              value={budget ?? ""}
-              onChange={(e) => setBudget(Number(e.target.value))}
+              type="text"
+              inputMode="numeric"
+              pattern="[1-9][0-9]*|0"
+              value={budget === undefined ? "" : String(budget)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "") {
+                  setBudget(undefined);
+                } else if (/^(0|[1-9][0-9]*)$/.test(value)) {
+                  setBudget(Number(value));
+                }
+              }}
               disabled={!editMode || loading}
-              min={0}
             />
             {editMode ? (
               <div className="flex gap-2">
