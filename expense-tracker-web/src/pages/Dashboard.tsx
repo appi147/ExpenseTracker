@@ -46,7 +46,7 @@ const Dashboard = () => {
     {
       label: "Expense Trends",
       description: "Visualize spending patterns via charts",
-      onClick: () => navigate("/expenses/chart"),
+      onClick: () => navigate("/expenses/trends"),
     },
   ];
 

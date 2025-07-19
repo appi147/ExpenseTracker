@@ -54,7 +54,7 @@ public class InsightController {
      *
      * @return a list of monthly category-wise expense summaries
      */
-    @GetMapping("/monthly-category-trends")
+    @GetMapping("/monthly-trends")
     @Operation(
             summary = "Get monthly category-wise expense trends",
             description = "Returns a list of total expenses grouped by category and by month. Useful for drawing trend charts where the x-axis is the month and lines represent categories."

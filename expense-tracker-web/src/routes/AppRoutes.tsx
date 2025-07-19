@@ -9,6 +9,7 @@ import Expenses from "@/pages/Expenses";
 import MonthlyInsights from "@/pages/MonthlyInsights";
 import SiteWideInsights from "@/pages/SiteWideInsights";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import MonthlyTrendsPage from "@/pages/MonthlyTrendsPage";
 
 const AppRoutes = () => {
   return (
@@ -72,6 +73,16 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <Layout>
                 <SiteWideInsights />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expenses/trends"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <MonthlyTrendsPage />
               </Layout>
             </ProtectedRoute>
           }
