@@ -2,6 +2,7 @@ package com.appi147.expensetracker.repository;
 
 import com.appi147.expensetracker.entity.Expense;
 import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.projection.MonthlyCategoryWiseExpense;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -62,4 +63,20 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
 
     @Query("SELECT e FROM Expense e JOIN FETCH e.createdBy WHERE e.expenseId = :id")
     Optional<Expense> findByIdWithCreator(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT
+                TO_CHAR(e.date, 'YYYY-MM') AS month,
+                c.label AS category,
+                SUM(e.amount) AS totalAmount
+            FROM {h-schema}expense e
+            JOIN {h-schema}sub_category sc ON e.sub_category_id = sc.sub_cat_id
+            JOIN {h-schema}category c ON sc.cat_id = c.cat_id
+            WHERE e.user_id = '106530343097679844197'
+              AND e.date >= date_trunc('month', CURRENT_DATE) - INTERVAL '11 months'
+              AND e.date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
+            GROUP BY month, category
+            ORDER BY month ASC, category ASC
+            """, nativeQuery = true)
+    List<MonthlyCategoryWiseExpense> getMonthlyCategoryTrends(@Param("userId") String userId);
 }
