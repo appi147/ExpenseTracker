@@ -45,5 +45,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: expense-tracker-web
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
