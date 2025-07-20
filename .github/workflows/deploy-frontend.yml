@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'expense-tracker-web/**'
-      - '.github/workflows/deploy-frontend.yml'
+      - "expense-tracker-web/**"
+      - ".github/workflows/deploy-frontend.yml"
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: expense-tracker-web/package-lock.json
 
       - name: Decode SSH Key
@@ -38,3 +38,17 @@ jobs:
         run: |
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ec2_key.pem" \
             expense-tracker-web/dist/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/expense-frontend/
+  sonar-scan:
+    name: SonarQube UI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./expense-tracker-web
+    steps:
+      - uses: actions/checkout@v4
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: expense-tracker-web
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
