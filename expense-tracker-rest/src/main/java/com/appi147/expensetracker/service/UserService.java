@@ -28,23 +28,25 @@ public class UserService {
     private final UserRepository userRepository;
 
     public LoginResponse getUserData(String token) throws GeneralSecurityException, IOException {
+        log.info("[UserService] Fetching user data with Google token");
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
         String sub = payload.getSubject();
         Optional<User> userOptional = userRepository.findById(sub);
         if (userOptional.isEmpty()) {
+            log.warn("[UserService] No user found with Google sub: {}", sub);
             throw new UnauthorizedException("Unauthorized");
         }
         User user = userOptional.get();
+        log.info("[UserService] User data found: userId={}, email={}", user.getUserId(), user.getEmail());
         return new LoginResponse(user);
     }
 
     public LoginResponse login(String token) throws GeneralSecurityException, IOException {
+        log.info("[UserService] Login attempt with Google token");
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(token);
 
-        // unique user id 255 chars
         String sub = payload.getSubject();
 
-        // check if sub in db
         Optional<User> userOptional = userRepository.findById(sub);
         String name = (String) payload.get("name");
         String email = (String) payload.get("email");
@@ -52,11 +54,14 @@ public class UserService {
         String lastName = (String) payload.get("family_name");
         String pictureUrl = (String) payload.get("picture");
         User user;
+        final boolean isNewUser;
         if (userOptional.isEmpty()) {
             user = new User();
             user.setUserId(sub);
+            isNewUser = true;
         } else {
             user = userOptional.get();
+            isNewUser = false;
         }
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -66,18 +71,25 @@ public class UserService {
         user.setLastLogin(ZonedDateTime.now(ZoneOffset.UTC));
         userRepository.saveAndFlush(user);
 
+        log.info("[UserService] User {}: userId={}, email={}, name={}",
+                isNewUser ? "registered" : "login", user.getUserId(), user.getEmail(), user.getFullName());
         return new LoginResponse(user);
     }
 
     public LoginResponse updateBudget(BudgetUpdate budgetUpdate) {
         User requester = UserContext.getCurrentUser();
+        log.info("[UserService] User [{}] updating budget to {}", requester.getUserId(), budgetUpdate.getAmount());
         requester.setBudget(budgetUpdate.getAmount());
-        return new LoginResponse(userRepository.saveAndFlush(requester));
+        LoginResponse response = new LoginResponse(userRepository.saveAndFlush(requester));
+        log.info("[UserService] Budget updated for user [{}]", requester.getUserId());
+        return response;
     }
 
     public void updateTheme(ThemeUpdate themeUpdate) {
         User requester = UserContext.getCurrentUser();
+        log.info("[UserService] User [{}] updating preferred theme to '{}'", requester.getUserId(), themeUpdate.getTheme());
         requester.setPreferredTheme(themeUpdate.getTheme());
         userRepository.saveAndFlush(requester);
+        log.info("[UserService] Preferred theme updated for user [{}]", requester.getUserId());
     }
 }

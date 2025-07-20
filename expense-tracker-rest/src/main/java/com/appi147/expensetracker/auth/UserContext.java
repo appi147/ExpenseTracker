@@ -9,7 +9,7 @@ public class UserContext {
     public static User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
-            return ((CustomUserDetails) auth.getPrincipal()).getUser();
+            return ((CustomUserDetails) auth.getPrincipal()).user();
         }
         throw new UnauthorizedException("User Unauthorized");
     }

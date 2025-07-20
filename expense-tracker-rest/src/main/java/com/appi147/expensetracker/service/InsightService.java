@@ -26,14 +26,20 @@ public class InsightService {
     @Cacheable(cacheNames = "siteWideInsight")
     @PreAuthorize("hasRole('ROLE_SUPER_USER')")
     public SiteWideInsight getInsights() {
-        return insightRepository.getSiteWideInsight();
+        log.info("[InsightService] Site-wide insight requested");
+        SiteWideInsight insight = insightRepository.getSiteWideInsight();
+        log.info("[InsightService] Site-wide insight fetched: {}", insight != null ? "success" : "null");
+        return insight;
     }
 
     public List<MonthlyTrendRow> getMonthlyTrends() {
         String userId = UserContext.getCurrentUser().getUserId();
-        List<MonthlyCategoryWiseExpense> rawData = expenseRepository.getMonthlyCategoryTrends(userId);
+        log.info("[InsightService] Fetching monthly trends for user [{}]", userId);
 
-        Set<String> allCategories = new TreeSet<>(); // Sorted set of all categories
+        List<MonthlyCategoryWiseExpense> rawData = expenseRepository.getMonthlyCategoryTrends(userId);
+        log.debug("[InsightService] Retrieved {} monthly trend rows from DB for user [{}]", rawData.size(), userId);
+
+        Set<String> allCategories = new TreeSet<>();
         Map<String, Map<String, BigDecimal>> grouped = new LinkedHashMap<>();
 
         for (MonthlyCategoryWiseExpense row : rawData) {
@@ -46,7 +52,11 @@ public class InsightService {
             grouped
                     .computeIfAbsent(month, m -> new LinkedHashMap<>())
                     .put(category, amount);
+
+            log.debug("[InsightService] Processed row: month={}, category={}, amount={}", month, category, amount);
         }
+
+        log.info("[InsightService] Identified {} distinct categories for trends: {}", allCategories.size(), allCategories);
 
         List<MonthlyTrendRow> result = new ArrayList<>();
         for (Map.Entry<String, Map<String, BigDecimal>> entry : grouped.entrySet()) {
@@ -63,7 +73,11 @@ public class InsightService {
                     .build();
 
             result.add(dto);
+            log.debug("[InsightService] Built MonthlyTrendRow for month {}: {}", month, categoryAmounts);
         }
+
+        log.info("[InsightService] Built {} monthly trend rows for user [{}]", result.size(), userId);
+
         return result;
     }
 }

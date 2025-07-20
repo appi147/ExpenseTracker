@@ -42,6 +42,8 @@ public class ExpenseService {
 
     public void addExpense(CreateExpenseRequest request) {
         User user = UserContext.getCurrentUser();
+        log.info("[ExpenseService] User [{}] adding expense: amount={}, date={}, subCategoryId={}, paymentTypeCode={}",
+                user.getUserId(), request.getAmount(), request.getDate(), request.getSubCategoryId(), request.getPaymentTypeCode());
 
         SubCategory subCategory = subCategoryService.getSubCategory(request.getSubCategoryId());
         PaymentType paymentType = paymentTypeService.getByCode(request.getPaymentTypeCode());
@@ -55,77 +57,97 @@ public class ExpenseService {
         expense.setCreatedBy(user);
 
         expenseRepository.saveAndFlush(expense);
+        log.info("[ExpenseService] Expense created: id={}, userId={}", expense.getExpenseId(), user.getUserId());
     }
 
     public MonthlyExpense getCurrentMonthExpense() {
         String userId = UserContext.getCurrentUser().getUserId();
+        log.info("[ExpenseService] Fetching current month expense summary for userId={}", userId);
         MonthlyExpense monthlyExpense = new MonthlyExpense();
         BigDecimal currentMonthExpense = getMonthlyExpenseSumForUser(userId, YearMonth.now());
         BigDecimal last30DaysExpense = getExpenseSumInPeriodForUser(userId, LocalDate.now().minusDays(30), LocalDate.now());
         monthlyExpense.setCurrentMonth(currentMonthExpense);
         monthlyExpense.setLast30Days(last30DaysExpense);
+        log.debug("[ExpenseService] MonthlyExpense for userId={}: currentMonth={}, last30Days={}",
+                userId, currentMonthExpense, last30DaysExpense);
         return monthlyExpense;
     }
 
     private BigDecimal getMonthlyExpenseSumForUser(String userId, YearMonth month) {
         LocalDate start = month.atDay(1);
         LocalDate end = month.atEndOfMonth();
+        log.debug("[ExpenseService] Summing expenses for userId={} between {} and {}", userId, start, end);
         return expenseRepository.getSumOfExpensesBetweenDatesForUser(userId, start, end);
     }
 
     private BigDecimal getExpenseSumInPeriodForUser(String userId, LocalDate from, LocalDate to) {
+        log.debug("[ExpenseService] Summing expenses for userId={} from {} to {}", userId, from, to);
         return expenseRepository.getSumOfExpensesBetweenDatesForUser(userId, from, to);
     }
 
     public Page<Expense> getFilteredExpenses(Long categoryId, Long subCategoryId, String paymentTypeCode,
                                              LocalDate dateFrom, LocalDate dateTo, int page, int size) {
         String userId = UserContext.getCurrentUser().getUserId();
+        log.info("[ExpenseService] Filtering expenses for userId={}, categoryId={}, subCategoryId={}, paymentTypeCode={}, dateFrom={}, dateTo={}, page={}, size={}",
+                userId, categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo, page, size);
         Specification<Expense> spec = ExpenseSpecification.filter(
                 userId, categoryId, subCategoryId, paymentTypeCode, dateFrom, dateTo
         );
         Pageable pageable = PageRequest.of(page, size, Sort.by("date", "updatedAt").descending());
-        return expenseRepository.findAll(spec, pageable);
+        Page<Expense> result = expenseRepository.findAll(spec, pageable);
+        log.info("[ExpenseService] Filtered expenses found: count={} for userId={}", result.getTotalElements(), userId);
+        return result;
     }
 
     public void deleteExpense(Long expenseId) {
         Expense expense = getExpenseIfOwnedByCurrentUser(expenseId);
-        log.info("Deleting expense [{}] by user [{}]", expenseId, expense.getCreatedBy().getUserId());
+        log.info("[ExpenseService] Deleting expense [{}] by user [{}]", expenseId, expense.getCreatedBy().getUserId());
         expenseRepository.delete(expense);
+        log.info("[ExpenseService] Expense [{}] deleted by user [{}]", expenseId, expense.getCreatedBy().getUserId());
     }
 
     private Expense getExpenseIfOwnedByCurrentUser(Long expenseId) {
         User requester = UserContext.getCurrentUser();
         Expense expense = expenseRepository.findByIdWithCreator(expenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense not found with id " + expenseId));
+                .orElseThrow(() -> {
+                    log.warn("[ExpenseService] Expense [{}] not found for user [{}]", expenseId, requester.getUserId());
+                    return new ResourceNotFoundException("Expense not found with id " + expenseId);
+                });
 
         if (expense.getCreatedBy() == null || !expense.getCreatedBy().getUserId().equals(requester.getUserId())) {
-            log.warn("User [{}] tried to access expense [{}] not owned by them", requester.getUserId(), expenseId);
+            log.warn("[ExpenseService] Access denied: user [{}] tried to access expense [{}] not owned by them", requester.getUserId(), expenseId);
             throw new ForbiddenException("You are not allowed to access this resource");
         }
-
+        log.debug("[ExpenseService] Expense [{}] accessed by owner [{}]", expenseId, requester.getUserId());
         return expense;
     }
 
     public void updateExpenseAmount(Long expenseId, BigDecimal amount) {
         Expense expense = getExpenseIfOwnedByCurrentUser(expenseId);
+        BigDecimal previousAmount = expense.getAmount();
         expense.setAmount(amount);
         expenseRepository.saveAndFlush(expense);
+        log.info("[ExpenseService] Expense [{}] amount updated from {} to {} by user [{}]", expenseId, previousAmount, amount, expense.getCreatedBy().getUserId());
     }
 
     public MonthlyExpenseInsight getMonthlyExpenseInsight(boolean monthly) {
         User user = UserContext.getCurrentUser();
-        LocalDate start, end;
 
+        LocalDate start, end;
         if (monthly) {
             YearMonth month = YearMonth.now();
             start = month.atDay(1);
             end = month.atEndOfMonth();
+            log.info("[ExpenseService] Getting category insight for user [{}] for current month [{}-{}]", user.getUserId(), start, end);
         } else {
             start = LocalDate.now().minusDays(30);
             end = LocalDate.now();
+            log.info("[ExpenseService] Getting category insight for user [{}] for the last 30 days [{}-{}]", user.getUserId(), start, end);
         }
 
         List<Expense> expenseList = expenseRepository.findByCreatedByAndDateBetween(user, start, end);
+
+        log.debug("[ExpenseService] Found {} expenses in period for user [{}]", expenseList.size(), user.getUserId());
 
         List<CategoryWiseExpense> categoryWiseExpenses = expenseList.stream()
                 .collect(Collectors.groupingBy(e -> e.getSubCategory().getCategory().getLabel()))
@@ -148,6 +170,8 @@ public class ExpenseService {
                             .map(SubCategoryWiseExpense::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+                    log.debug("[ExpenseService] Category [{}] total={} for user [{}]", category, categoryTotal, user.getUserId());
+
                     return new CategoryWiseExpense(category, categoryTotal, subCategoryWiseExpenses);
                 })
                 .sorted(Comparator.comparing(CategoryWiseExpense::getAmount, Comparator.reverseOrder()))
@@ -156,6 +180,8 @@ public class ExpenseService {
         BigDecimal totalAmount = categoryWiseExpenses.stream()
                 .map(CategoryWiseExpense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        log.info("[ExpenseService] MonthlyExpenseInsight: user [{}], budget={}, periodTotal={}", user.getUserId(), user.getBudget(), totalAmount);
 
         return new MonthlyExpenseInsight(user.getBudget(), totalAmount, categoryWiseExpenses);
     }
