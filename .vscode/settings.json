@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "appi147",
+        "projectKey": "appi147_ExpenseTracker"
+    }
+}
