@@ -40,32 +40,3 @@ jobs:
             pkill -f 'java -jar' || true
             nohup java -jar ${{ secrets.EC2_APP_DIR }}/app.jar > app.log 2>&1 &
           EOF
-  sonar-scan:
-    name: SonarQube Maven
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./expense-tracker-rest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: "temurin"
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=appi147_ExpenseTracker

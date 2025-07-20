@@ -1,0 +1,44 @@
+name: SonarQube Monorepo Unified Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  analyze:
+    name: SonarQube Unified Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK for backend
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+
+      - name: Build backend (Maven)
+        run: mvn clean install --file expense-tracker-rest/pom.xml
+
+      - name: Set up Node for frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: expense-tracker-web/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd expense-tracker-web
+          npm ci
+          npm run build
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

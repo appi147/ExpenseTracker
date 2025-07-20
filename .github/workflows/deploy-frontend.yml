@@ -38,17 +38,3 @@ jobs:
         run: |
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ec2_key.pem" \
             expense-tracker-web/dist/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/expense-frontend/
-  sonar-scan:
-    name: SonarQube UI
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./expense-tracker-web
-    steps:
-      - uses: actions/checkout@v4
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        with:
-          projectBaseDir: expense-tracker-web
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
