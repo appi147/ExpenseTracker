@@ -100,7 +100,49 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
     }
   };
 
-  return (
+  return category.deletable ? (
+    <div className="flex items-center justify-between py-2 border-b">
+      {editingCategoryId === category.categoryId ? (
+        <div className="flex items-center gap-2">
+          <Input
+            value={editingLabel}
+            onChange={(e) => setEditingLabel(e.target.value)}
+            className="w-64"
+          />
+          <Button size="sm" onClick={handleCategoryUpdate}>
+            Save
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setEditingCategoryId(null)}>
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <FolderIcon className="w-4 h-4" />
+            <span>{category.label}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5"
+              onClick={() => {
+                setEditingCategoryId(category.categoryId);
+                setEditingLabel(category.label);
+              }}
+            >
+              <Pencil className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          </div>
+
+          {category.deletable && (
+            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCategoryDelete}>
+              <Trash2 className="w-4 h-4 text-destructive" />
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  ) : (
     <AccordionItem value={String(category.categoryId)}>
       <AccordionTrigger
         className="text-xl font-semibold no-underline hover:no-underline"
@@ -139,12 +181,6 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
               >
                 <Pencil className="w-2 h-2 text-muted-foreground" />
               </Button>
-              {category.deletable && (
-                <Trash2
-                  className="w-2 h-2 text-destructive cursor-pointer"
-                  onClick={handleCategoryDelete}
-                />
-              )}
             </>
           )}
         </div>
