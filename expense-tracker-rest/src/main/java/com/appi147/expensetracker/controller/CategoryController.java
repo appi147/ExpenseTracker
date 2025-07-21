@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "201", description = "Category created"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryCreateRequest categoryCreateRequest) {
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryCreateRequest categoryCreateRequest) {
         Category category = categoryService.createCategory(categoryCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
@@ -51,7 +52,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<Category> editCategory(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
+    public ResponseEntity<Category> editCategory(@PathVariable Long id, @Valid @RequestBody LabelUpdateRequest request) {
         Category updated = categoryService.editCategory(id, request);
         return ResponseEntity.ok(updated);
     }

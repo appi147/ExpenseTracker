@@ -158,8 +158,8 @@ class ExpenseServiceTest {
             MonthlyExpense me = spyService.getCurrentMonthExpense();
 
             assertNotNull(me);
-            assertEquals(curMonth, me.getCurrentMonth());
-            assertEquals(last30, me.getLast30Days());
+            assertEquals(curMonth, me.currentMonth());
+            assertEquals(last30, me.last30Days());
         }
     }
 
@@ -175,8 +175,8 @@ class ExpenseServiceTest {
             MonthlyExpense me = expenseService.getCurrentMonthExpense();
 
             assertNotNull(me);
-            assertNull(me.getCurrentMonth());    // depends on how your MonthlyExpense is implemented!
-            assertNull(me.getLast30Days());
+            assertNull(me.currentMonth());    // depends on how your MonthlyExpense is implemented!
+            assertNull(me.last30Days());
         }
     }
 
@@ -340,22 +340,22 @@ class ExpenseServiceTest {
             MonthlyExpenseInsight insight = expenseService.getMonthlyExpenseInsight(true);
 
             assertNotNull(insight);
-            assertEquals(new BigDecimal("2000"), insight.getMonthlyBudget());
-            assertEquals(new BigDecimal("600"), insight.getTotalExpense());
+            assertEquals(new BigDecimal("2000"), insight.monthlyBudget());
+            assertEquals(new BigDecimal("600"), insight.totalExpense());
 
             // Category-wise
-            assertEquals(2, insight.getCategoryWiseExpenses().size());
-            CategoryWiseExpense cwe1 = insight.getCategoryWiseExpenses().get(0);
-            CategoryWiseExpense cwe2 = insight.getCategoryWiseExpenses().get(1);
+            assertEquals(2, insight.categoryWiseExpenses().size());
+            CategoryWiseExpense cwe1 = insight.categoryWiseExpenses().get(0);
+            CategoryWiseExpense cwe2 = insight.categoryWiseExpenses().get(1);
             // Sorted by amount descending
-            assertTrue(cwe1.getAmount().compareTo(cwe2.getAmount()) >= 0);
+            assertTrue(cwe1.amount().compareTo(cwe2.amount()) >= 0);
             // Subcategory-wise
             List<SubCategoryWiseExpense> scweAll = new ArrayList<>();
-            scweAll.addAll(cwe1.getSubCategoryWiseExpenses());
-            scweAll.addAll(cwe2.getSubCategoryWiseExpenses());
-            BigDecimal all = scweAll.stream().map(SubCategoryWiseExpense::getAmount)
+            scweAll.addAll(cwe1.subCategoryWiseExpenses());
+            scweAll.addAll(cwe2.subCategoryWiseExpenses());
+            BigDecimal all = scweAll.stream().map(SubCategoryWiseExpense::amount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            assertEquals(insight.getTotalExpense(), all);
+            assertEquals(insight.totalExpense(), all);
         }
     }
 
@@ -372,9 +372,9 @@ class ExpenseServiceTest {
 
             MonthlyExpenseInsight insight = expenseService.getMonthlyExpenseInsight(false);
 
-            assertEquals(BigDecimal.TEN, insight.getMonthlyBudget());
-            assertEquals(BigDecimal.ZERO, insight.getTotalExpense());
-            assertTrue(insight.getCategoryWiseExpenses().isEmpty());
+            assertEquals(BigDecimal.TEN, insight.monthlyBudget());
+            assertEquals(BigDecimal.ZERO, insight.totalExpense());
+            assertTrue(insight.categoryWiseExpenses().isEmpty());
         }
     }
 

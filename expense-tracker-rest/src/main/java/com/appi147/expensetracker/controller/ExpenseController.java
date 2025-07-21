@@ -114,7 +114,7 @@ public class ExpenseController {
      */
     @PutMapping("/{expenseId}/amount")
     @Operation(summary = "Update the amount of an expense")
-    public ResponseEntity<Void> updateExpenseAmount(@PathVariable Long expenseId, @RequestBody EditExpenseAmount editExpenseAmount) {
+    public ResponseEntity<Void> updateExpenseAmount(@PathVariable Long expenseId, @Valid @RequestBody EditExpenseAmount editExpenseAmount) {
         expenseService.updateExpenseAmount(expenseId, editExpenseAmount.getAmount());
         return ResponseEntity.ok().build();
     }

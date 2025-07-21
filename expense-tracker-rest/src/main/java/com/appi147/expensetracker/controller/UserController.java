@@ -6,6 +6,7 @@ import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,13 @@ public class UserController {
 
     @Operation(summary = "Update monthly budget", description = "Updates the user's monthly budget.")
     @PutMapping("/budget")
-    public ResponseEntity<LoginResponse> updateBudget(@RequestBody BudgetUpdate request) {
+    public ResponseEntity<LoginResponse> updateBudget(@Valid @RequestBody BudgetUpdate request) {
         return ResponseEntity.ok(userService.updateBudget(request));
     }
 
     @Operation(summary = "Update theme", description = "Updates the user's default theme.")
     @PutMapping("/theme")
-    public ResponseEntity<Void> updateTheme(@RequestBody ThemeUpdate request) {
+    public ResponseEntity<Void> updateTheme(@Valid @RequestBody ThemeUpdate request) {
         userService.updateTheme(request);
         return ResponseEntity.noContent().build();
     }

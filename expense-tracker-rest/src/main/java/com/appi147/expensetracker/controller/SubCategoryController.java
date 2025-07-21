@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own the category")
     })
-    public ResponseEntity<SubCategory> create(@RequestBody SubCategoryCreateRequest request) {
+    public ResponseEntity<SubCategory> create(@Valid @RequestBody SubCategoryCreateRequest request) {
         SubCategory subCategory = subCategoryService.createSubCategory(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(subCategory);
     }
@@ -62,7 +63,7 @@ public class SubCategoryController {
             @ApiResponse(responseCode = "404", description = "Sub-category not found"),
             @ApiResponse(responseCode = "403", description = "Forbidden - you don't own this sub-category")
     })
-    public ResponseEntity<SubCategory> update(@PathVariable Long id, @RequestBody LabelUpdateRequest request) {
+    public ResponseEntity<SubCategory> update(@PathVariable Long id, @Valid @RequestBody LabelUpdateRequest request) {
         SubCategory updated = subCategoryService.editSubCategory(id, request);
         return ResponseEntity.ok(updated);
     }

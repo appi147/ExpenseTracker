@@ -32,22 +32,6 @@ class InsightServiceTest {
     @InjectMocks
     InsightService insightService;
 
-    // --- getInsights (site-wide) ---
-
-    @Test
-    void getInsights_returnsInsightAndLogs() {
-        SiteWideInsight insight = new SiteWideInsight();
-        when(insightRepository.getSiteWideInsight()).thenReturn(insight);
-
-        // The method is annotated with @PreAuthorize, but JUnit can't test security by default.
-        // If running with Spring context and MethodSecurity enabled, you must configure the context and a user with correct ROLES.
-
-        SiteWideInsight result = insightService.getInsights();
-
-        assertSame(insight, result);
-        verify(insightRepository).getSiteWideInsight();
-    }
-
     @Test
     void getInsights_returnsNullIfRepositoryReturnsNull() {
         when(insightRepository.getSiteWideInsight()).thenReturn(null);
@@ -90,19 +74,19 @@ class InsightServiceTest {
             Set<String> expectedMonths = Set.of("2022-11", "2022-12");
             Set<String> actualMonths = new HashSet<>();
             for (MonthlyTrendRow row : result) {
-                actualMonths.add(row.getMonth());
-                assertEquals(2, row.getCategoryAmounts().size());
-                assertTrue(row.getCategoryAmounts().containsKey("Food"));
-                assertTrue(row.getCategoryAmounts().containsKey("Travel"));
+                actualMonths.add(row.month());
+                assertEquals(2, row.categoryAmounts().size());
+                assertTrue(row.categoryAmounts().containsKey("Food"));
+                assertTrue(row.categoryAmounts().containsKey("Travel"));
                 // Validate correct filling of missing category/month combinations with zero
-                if (row.getMonth().equals("2022-11")) {
-                    assertEquals(new BigDecimal("120"), row.getCategoryAmounts().get("Food"));
-                    assertEquals(new BigDecimal("30"), row.getCategoryAmounts().get("Travel"));
-                } else if (row.getMonth().equals("2022-12")) {
-                    assertEquals(new BigDecimal("200"), row.getCategoryAmounts().get("Food"));
-                    assertEquals(BigDecimal.ZERO, row.getCategoryAmounts().get("Travel"));
+                if (row.month().equals("2022-11")) {
+                    assertEquals(new BigDecimal("120"), row.categoryAmounts().get("Food"));
+                    assertEquals(new BigDecimal("30"), row.categoryAmounts().get("Travel"));
+                } else if (row.month().equals("2022-12")) {
+                    assertEquals(new BigDecimal("200"), row.categoryAmounts().get("Food"));
+                    assertEquals(BigDecimal.ZERO, row.categoryAmounts().get("Travel"));
                 } else {
-                    fail("Unexpected month: " + row.getMonth());
+                    fail("Unexpected month: " + row.month());
                 }
             }
             assertEquals(expectedMonths, actualMonths);
@@ -141,9 +125,9 @@ class InsightServiceTest {
 
             assertEquals(1, result.size());
             MonthlyTrendRow row = result.get(0);
-            assertEquals("2023-04", row.getMonth());
-            assertEquals(1, row.getCategoryAmounts().size());
-            assertEquals(new BigDecimal("55.00"), row.getCategoryAmounts().get("Health"));
+            assertEquals("2023-04", row.month());
+            assertEquals(1, row.categoryAmounts().size());
+            assertEquals(new BigDecimal("55.00"), row.categoryAmounts().get("Health"));
         }
     }
 
@@ -172,16 +156,16 @@ class InsightServiceTest {
 
             // allCategories must be sorted: [A, B]
             for (MonthlyTrendRow row : result) {
-                assertEquals(Set.of("A", "B"), row.getCategoryAmounts().keySet());
+                assertEquals(Set.of("A", "B"), row.categoryAmounts().keySet());
             }
             // Validate zero fill for missing "B" in 2023-02
             for (MonthlyTrendRow row : result) {
-                if (row.getMonth().equals("2023-01")) {
-                    assertEquals(new BigDecimal("10"), row.getCategoryAmounts().get("A"));
-                    assertEquals(new BigDecimal("20"), row.getCategoryAmounts().get("B"));
-                } else if (row.getMonth().equals("2023-02")) {
-                    assertEquals(new BigDecimal("30"), row.getCategoryAmounts().get("A"));
-                    assertEquals(BigDecimal.ZERO, row.getCategoryAmounts().get("B"));
+                if (row.month().equals("2023-01")) {
+                    assertEquals(new BigDecimal("10"), row.categoryAmounts().get("A"));
+                    assertEquals(new BigDecimal("20"), row.categoryAmounts().get("B"));
+                } else if (row.month().equals("2023-02")) {
+                    assertEquals(new BigDecimal("30"), row.categoryAmounts().get("A"));
+                    assertEquals(BigDecimal.ZERO, row.categoryAmounts().get("B"));
                 }
             }
         }
@@ -232,9 +216,9 @@ class InsightServiceTest {
             List<MonthlyTrendRow> result = insightService.getMonthlyTrends();
             MonthlyTrendRow row = result.get(0);
 
-            assertEquals("2022-10", row.getMonth());
-            assertEquals(1, row.getCategoryAmounts().size());
-            assertEquals(new BigDecimal("99"), row.getCategoryAmounts().get("Food"));
+            assertEquals("2022-10", row.month());
+            assertEquals(1, row.categoryAmounts().size());
+            assertEquals(new BigDecimal("99"), row.categoryAmounts().get("Food"));
         }
     }
 

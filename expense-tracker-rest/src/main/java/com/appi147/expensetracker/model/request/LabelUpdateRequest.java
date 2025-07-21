@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class LabelUpdateRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Label cannot be blank")
+    @Size(max = 100, message = "Label must not exceed 100 characters")
     private String label;
 }

@@ -6,6 +6,7 @@ import com.appi147.expensetracker.service.PaymentTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class PaymentTypeController {
      */
     @PostMapping
     @Operation(summary = "Create a new payment type", description = "Creates a new payment type based on the request data")
-    public ResponseEntity<PaymentType> create(@RequestBody PaymentTypeRequest request) {
+    public ResponseEntity<PaymentType> create(@Valid @RequestBody PaymentTypeRequest request) {
         return ResponseEntity.ok(paymentTypeService.create(request));
     }
 
@@ -57,7 +58,7 @@ public class PaymentTypeController {
      */
     @PutMapping("/{id}")
     @Operation(summary = "Update a payment type", description = "Updates the payment type with the given ID")
-    public ResponseEntity<PaymentType> update(@PathVariable Long id, @RequestBody PaymentTypeRequest request) {
+    public ResponseEntity<PaymentType> update(@PathVariable Long id, @Valid @RequestBody PaymentTypeRequest request) {
         return ResponseEntity.ok(paymentTypeService.update(id, request));
     }
 

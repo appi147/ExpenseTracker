@@ -63,11 +63,10 @@ public class ExpenseService {
     public MonthlyExpense getCurrentMonthExpense() {
         String userId = UserContext.getCurrentUser().getUserId();
         log.info("[ExpenseService] Fetching current month expense summary for userId={}", userId);
-        MonthlyExpense monthlyExpense = new MonthlyExpense();
+
         BigDecimal currentMonthExpense = getMonthlyExpenseSumForUser(userId, YearMonth.now());
         BigDecimal last30DaysExpense = getExpenseSumInPeriodForUser(userId, LocalDate.now().minusDays(30), LocalDate.now());
-        monthlyExpense.setCurrentMonth(currentMonthExpense);
-        monthlyExpense.setLast30Days(last30DaysExpense);
+        MonthlyExpense monthlyExpense = new MonthlyExpense(last30DaysExpense, currentMonthExpense);
         log.debug("[ExpenseService] MonthlyExpense for userId={}: currentMonth={}, last30Days={}",
                 userId, currentMonthExpense, last30DaysExpense);
         return monthlyExpense;
@@ -163,22 +162,22 @@ public class ExpenseService {
 
                     List<SubCategoryWiseExpense> subCategoryWiseExpenses = subCategorySums.entrySet().stream()
                             .map(e -> new SubCategoryWiseExpense(e.getKey(), e.getValue()))
-                            .sorted(Comparator.comparing(SubCategoryWiseExpense::getAmount, Comparator.reverseOrder()))
+                            .sorted(Comparator.comparing(SubCategoryWiseExpense::amount, Comparator.reverseOrder()))
                             .toList();
 
                     BigDecimal categoryTotal = subCategoryWiseExpenses.stream()
-                            .map(SubCategoryWiseExpense::getAmount)
+                            .map(SubCategoryWiseExpense::amount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     log.debug("[ExpenseService] Category [{}] total={} for user [{}]", category, categoryTotal, user.getUserId());
 
                     return new CategoryWiseExpense(category, categoryTotal, subCategoryWiseExpenses);
                 })
-                .sorted(Comparator.comparing(CategoryWiseExpense::getAmount, Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(CategoryWiseExpense::amount, Comparator.reverseOrder()))
                 .toList();
 
         BigDecimal totalAmount = categoryWiseExpenses.stream()
-                .map(CategoryWiseExpense::getAmount)
+                .map(CategoryWiseExpense::amount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         log.info("[ExpenseService] MonthlyExpenseInsight: user [{}], budget={}, periodTotal={}", user.getUserId(), user.getBudget(), totalAmount);

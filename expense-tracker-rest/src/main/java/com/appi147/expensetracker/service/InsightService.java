@@ -67,10 +67,7 @@ public class InsightService {
                 categoryAmounts.put(category, entry.getValue().getOrDefault(category, BigDecimal.ZERO));
             }
 
-            MonthlyTrendRow dto = MonthlyTrendRow.builder()
-                    .month(month)
-                    .categoryAmounts(categoryAmounts)
-                    .build();
+            MonthlyTrendRow dto = new MonthlyTrendRow(month, categoryAmounts);
 
             result.add(dto);
             log.debug("[InsightService] Built MonthlyTrendRow for month {}: {}", month, categoryAmounts);
