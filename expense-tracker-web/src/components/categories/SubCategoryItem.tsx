@@ -25,9 +25,9 @@ export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategory
   };
 
   return (
-    <div className="flex items-center justify-between ml-4 pl-2 border-l border-gray-700">
+    <div className="flex items-center justify-between ml-4 pl-2 border-l border-gray-700 py-1">
       {isEditing ? (
-        <>
+        <div className="flex items-center gap-2 w-full">
           <Input
             value={editLabel}
             onChange={(e) => setEditLabel(e.target.value)}
@@ -39,24 +39,26 @@ export default function SubCategoryItem({ sub, onUpdate, onDelete }: SubCategory
           <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
             Cancel
           </Button>
-        </>
+        </div>
       ) : (
         <>
-          <div className="flex items-center gap-2 text-sm">
-            <FileIcon className="w-3 h-3" />
-            <span>{sub.label}</span>
+          <div className="flex items-center gap-2 text-sm overflow-hidden">
+            <FileIcon className="w-4 h-4 shrink-0" />
+            <span className="truncate">{sub.label}</span>
+            <Pencil
+              className="w-4 h-4 cursor-pointer text-muted-foreground shrink-0"
+              onClick={() => setIsEditing(true)}
+            />
           </div>
-          <div className="flex gap-2 items-center">
-            <Pencil className="w-4 h-4 cursor-pointer" onClick={() => setIsEditing(true)} />
-            {sub.deletable ? (
-              <Trash2
-                className="w-4 h-4 text-destructive cursor-pointer"
-                onClick={() => onDelete(sub.subCategoryId)}
-              />
-            ) : (
-              <Trash2 className="w-4 h-4 text-muted cursor-not-allowed" />
-            )}
-          </div>
+
+          {sub.deletable ? (
+            <Trash2
+              className="w-4 h-4 text-destructive cursor-pointer ml-2 shrink-0"
+              onClick={() => onDelete(sub.subCategoryId)}
+            />
+          ) : (
+            <Trash2 className="w-4 h-4 text-muted cursor-not-allowed ml-2 shrink-0" />
+          )}
         </>
       )}
     </div>
