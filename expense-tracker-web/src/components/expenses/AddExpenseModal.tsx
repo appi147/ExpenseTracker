@@ -16,7 +16,6 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-
 import { createExpense } from "@/services/expense-service";
 import { getAllPaymentTypes, type PaymentType } from "@/services/payment-type-service";
 import { getAllCategories, type Category } from "@/services/category-service";
@@ -26,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -44,6 +44,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [paymentTypes, setPaymentTypes] = useState<PaymentType[]>([]);
+  const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
 
   useEffect(() => {
     async function loadOptions() {
@@ -52,7 +53,6 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
           getAllPaymentTypes(),
           getAllCategories(),
         ]);
-
         setPaymentTypes(paymentData);
         setCategories(categoryData);
       } catch {
@@ -112,7 +112,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label>Date</label>
-            <Popover>
+            <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -132,11 +132,17 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                   onSelect={(selected) => {
                     if (!selected) return;
 
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (selected > today) return;
+
                     const year = selected.getFullYear();
                     const month = String(selected.getMonth() + 1).padStart(2, "0");
                     const day = String(selected.getDate()).padStart(2, "0");
                     setDate(`${year}-${month}-${day}`);
+                    setIsDatePopoverOpen(false);
                   }}
+                  toDate={new Date()}
                   initialFocus
                 />
               </PopoverContent>
@@ -145,43 +151,62 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
 
           <div>
             <label>Category</label>
-            <Select
-              value={categoryId?.toString()}
-              onValueChange={(val) => setCategoryId(parseInt(val))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {categoryId && (
-            <div>
-              <label>Subcategory</label>
+            {categories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No categories found.{" "}
+                <Link to="/categories" className="text-blue-600 underline">
+                  Add a category
+                </Link>{" "}
+                to continue.
+              </p>
+            ) : (
               <Select
-                value={subCategoryId?.toString()}
-                onValueChange={(val) => setSubCategoryId(parseInt(val))}
+                value={categoryId?.toString()}
+                onValueChange={(val) => setCategoryId(parseInt(val))}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a subcategory" />
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {subCategories.map((sub) => (
-                    <SelectItem key={sub.subCategoryId} value={sub.subCategoryId.toString()}>
-                      {sub.label}
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
+                      {cat.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          )}
+            )}
+          </div>
+
+          {categoryId &&
+            (subCategories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No subcategories found.{" "}
+                <Link to="/sub-categories" className="text-blue-600 underline">
+                  Add a subcategory
+                </Link>{" "}
+                under the selected category to continue.
+              </p>
+            ) : (
+              <div>
+                <label>Subcategory</label>
+                <Select
+                  value={subCategoryId?.toString()}
+                  onValueChange={(val) => setSubCategoryId(parseInt(val))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a subcategory" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subCategories.map((sub) => (
+                      <SelectItem key={sub.subCategoryId} value={sub.subCategoryId.toString()}>
+                        {sub.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
 
           <div>
             <label>Amount</label>
@@ -227,7 +252,19 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             <Button variant="outline" type="button" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Add Expense</Button>
+            <Button
+              type="submit"
+              disabled={
+                !amount ||
+                !date ||
+                !paymentTypeCode ||
+                !subCategoryId ||
+                categories.length === 0 ||
+                subCategories.length === 0
+              }
+            >
+              Add Expense
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

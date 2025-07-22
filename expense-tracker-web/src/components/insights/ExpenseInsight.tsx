@@ -43,67 +43,84 @@ export default function ExpenseInsight({ initialMonthly }: Props) {
     return createCategoryColorMap(pieChartData.map((d) => d.name));
   }, [pieChartData]);
 
+  let renderContent;
+
+  if (loading) {
+    renderContent = <p>Loading...</p>;
+  } else if (!data || data.totalExpense === 0) {
+    renderContent = (
+      <Card>
+        <CardContent className="p-6 text-center space-y-4">
+          <p className="text-lg font-semibold">No expenses found</p>
+          <p className="text-muted-foreground">
+            You haven’t added any expenses yet. Once you do, insights will appear here.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  } else {
+    renderContent = (
+      <>
+        <Card>
+          <CardContent className="p-4">
+            <BudgetProgress totalExpense={data.totalExpense} monthlyBudget={data.monthlyBudget} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Category-wise Spending</h2>
+              <Button variant="ghost" size="sm" onClick={() => setShowPieChart((prev) => !prev)}>
+                {showPieChart ? (
+                  <>
+                    <ChevronDown className="w-4 h-4 mr-1" />
+                    Hide Pie Chart
+                  </>
+                ) : (
+                  <>
+                    <ChevronRight className="w-4 h-4 mr-1" />
+                    Show Pie Chart
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {showPieChart && (
+              <div className="transition-all duration-300 ease-in-out">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label
+                    >
+                      {pieChartData.map((entry) => (
+                        <Cell key={entry.name} fill={colorMap[entry.name]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend layout="vertical" verticalAlign="middle" align="right" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <CategoryAccordion data={data.categoryWiseExpenses} />
+      </>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <ToggleDuration monthly={monthly} onChange={setMonthly} />
-
-      {loading && <p>Loading...</p>}
-      {!loading && data && (
-        <>
-          <Card>
-            <CardContent className="p-4">
-              <BudgetProgress totalExpense={data.totalExpense} monthlyBudget={data.monthlyBudget} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold">Category-wise Spending</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowPieChart((prev) => !prev)}>
-                  {showPieChart ? (
-                    <>
-                      <ChevronDown className="w-4 h-4 mr-1" />
-                      Hide Pie Chart
-                    </>
-                  ) : (
-                    <>
-                      <ChevronRight className="w-4 h-4 mr-1" />
-                      Show Pie Chart
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {showPieChart && (
-                <div className="transition-all duration-300 ease-in-out">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={pieChartData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        label
-                      >
-                        {pieChartData.map((entry) => (
-                          <Cell key={entry.name} fill={colorMap[entry.name]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend layout="vertical" verticalAlign="middle" align="right" />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <CategoryAccordion data={data.categoryWiseExpenses} />
-        </>
-      )}
+      {renderContent}
     </div>
   );
 }

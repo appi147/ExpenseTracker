@@ -72,7 +72,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
             FROM {h-schema}expense e
             JOIN {h-schema}sub_category sc ON e.sub_category_id = sc.sub_cat_id
             JOIN {h-schema}category c ON sc.cat_id = c.cat_id
-            WHERE e.user_id = '106530343097679844197'
+            WHERE e.user_id = :userId
               AND e.date >= date_trunc('month', CURRENT_DATE) - INTERVAL '11 months'
               AND e.date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
             GROUP BY month, category

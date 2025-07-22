@@ -97,33 +97,39 @@ export default function MonthlyExpenseTrends() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Monthly Expense Trends</CardTitle>
-        <Button variant="outline" size="sm" onClick={exportAsPng}>
+        <Button variant="outline" size="sm" onClick={exportAsPng} disabled={data.length === 0}>
           Export PNG
         </Button>
       </CardHeader>
       <CardContent>
-        <div ref={chartRef}>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#ccc", strokeWidth: 1 }} />
-              <Legend content={renderLegend} />
-              {allCategories.map((cat) => (
-                <Line
-                  key={cat}
-                  type="monotone"
-                  strokeWidth={2}
-                  dataKey={cat}
-                  stroke={colorMap[cat]}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 5 }}
-                  hide={hiddenLines[cat]}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {data.length === 0 ? (
+          <div className="text-center text-muted-foreground py-10">
+            No expense trends available.
+          </div>
+        ) : (
+          <div ref={chartRef}>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#ccc", strokeWidth: 1 }} />
+                <Legend content={renderLegend} />
+                {allCategories.map((cat) => (
+                  <Line
+                    key={cat}
+                    type="monotone"
+                    strokeWidth={2}
+                    dataKey={cat}
+                    stroke={colorMap[cat]}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 5 }}
+                    hide={hiddenLines[cat]}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

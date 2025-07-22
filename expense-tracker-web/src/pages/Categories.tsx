@@ -48,11 +48,18 @@ export default function CategoriesPage() {
             <Button onClick={handleCreateCategory}>Add Category</Button>
           </div>
 
-          <Accordion type="single" collapsible>
-            {categories.map((cat) => (
-              <CategoryItem key={cat.categoryId} category={cat} reloadCategories={loadData} />
-            ))}
-          </Accordion>
+          {categories.length > 0 ? (
+            <Accordion type="single" collapsible>
+              {categories.map((cat) => (
+                <CategoryItem key={cat.categoryId} category={cat} reloadCategories={loadData} />
+              ))}
+            </Accordion>
+          ) : (
+            <div className="text-center text-muted-foreground py-12">
+              <p className="text-lg">No categories yet.</p>
+              <p className="text-sm">Add one using the input above.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
