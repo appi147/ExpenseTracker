@@ -40,6 +40,14 @@ export interface MonthlyExpenseInsight {
   monthlyBudget: number;
 }
 
+export type ExportFormat = "csv" | "excel";
+
+interface ExportParams {
+  dateFrom?: string;
+  dateTo?: string;
+  format: ExportFormat;
+}
+
 export const createExpense = async (data: CreateExpenseRequest) => {
   const response = await API.post("/expense/create", data);
   return response.data;
@@ -83,4 +91,26 @@ export const getMonthlyInsight = async (
 ): Promise<MonthlyExpenseInsight> => {
   const response = await API.get(`/expense/insight?monthly=${monthly}`);
   return response.data;
+};
+
+export const exportExpenses = async ({ dateFrom, dateTo, format }: ExportParams) => {
+  const params = new URLSearchParams();
+  if (dateFrom) params.set("dateFrom", dateFrom);
+  if (dateTo) params.set("dateTo", dateTo);
+  params.set("format", format);
+
+  const response = await API.get(`/expense/export?${params.toString()}`, {
+    responseType: "blob",
+  });
+
+  const ext = format === "csv" ? "csv" : "xlsx";
+  const fileName = `expenses-${Date.now()}.${ext}`;
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 };

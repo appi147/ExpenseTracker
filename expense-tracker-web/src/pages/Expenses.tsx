@@ -15,13 +15,27 @@ import {
   getFilteredExpenses,
   deleteExpense,
   updateExpenseAmount,
+  exportExpenses,
 } from "@/services/expense-service";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportType, setExportType] = useState<"full" | "range">("full");
+  const [exportDateRange, setExportDateRange] = useState<{ from: string; to: string } | null>(null);
 
   type Filters = {
     dateRange: { from: string; to: string } | null;
@@ -74,6 +88,14 @@ export default function Expenses() {
     },
     [fetchExpenses],
   );
+
+  const handleExport = (format: "csv" | "excel") => {
+    exportExpenses({
+      format,
+      dateFrom: exportType === "range" ? exportDateRange?.from : undefined,
+      dateTo: exportType === "range" ? exportDateRange?.to : undefined,
+    });
+  };
 
   const columns = useMemo(
     () => getExpenseColumns(handleEditAmount, handleDelete),
@@ -185,6 +207,45 @@ export default function Expenses() {
             Reset Filters
           </button>
         </CardContent>
+        <CardContent className="px-4 pb-4">
+          <Button variant="outline" className="text-sm" onClick={() => setExportOpen(true)}>
+            Export
+          </Button>
+        </CardContent>
+
+        <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Export Expenses</DialogTitle>
+            </DialogHeader>
+
+            <RadioGroup
+              value={exportType}
+              onValueChange={(val) => setExportType(val as "full" | "range")}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="full" id="full" />
+                <Label htmlFor="full">Full Export</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="range" id="range" />
+                <Label htmlFor="range">Specific Date Range</Label>
+              </div>
+            </RadioGroup>
+
+            {exportType === "range" && (
+              <div className="pt-4">
+                <Label className="mb-1 block">Select Date Range</Label>
+                <DateRangePicker value={exportDateRange} onChange={setExportDateRange} />
+              </div>
+            )}
+
+            <DialogFooter className="gap-2 pt-4">
+              <Button onClick={() => handleExport("csv")}>Export as CSV</Button>
+              <Button onClick={() => handleExport("excel")}>Export as Excel</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
 
       {expenses.length === 0 ? (
