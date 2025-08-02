@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
 import ToggleDuration from "@/components/insights/ToggleDuration";
-import { Plus, Repeat, CalendarClock, IndianRupee } from "lucide-react";
+import { Plus, Repeat, IndianRupee } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -125,16 +125,6 @@ const Dashboard = () => {
               className="flex items-center gap-2"
             >
               <IndianRupee size={16} /> Add Expense
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                navigate("/expenses/amortized");
-                setShowFabOptions(false);
-              }}
-              className="flex items-center gap-2"
-            >
-              <CalendarClock size={16} /> Amortized
             </Button>
             <Button
               variant="secondary"
