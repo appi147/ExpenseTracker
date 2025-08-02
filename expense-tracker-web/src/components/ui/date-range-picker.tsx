@@ -14,9 +14,9 @@ export interface DateRangeValue {
 }
 
 interface DateRangePickerProps {
-  value: DateRangeValue | null;
-  onChange: (val: DateRangeValue | null) => void;
-  className?: string;
+  readonly value: DateRangeValue | null;
+  readonly onChange: (val: DateRangeValue | null) => void;
+  readonly className?: string;
 }
 
 export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {

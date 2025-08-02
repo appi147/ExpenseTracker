@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Theme, ThemeProviderProps, ThemeProviderState } from "./theme-types";
 
 const initialState: ThemeProviderState = {
@@ -14,9 +14,13 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-  );
+  const getInitialTheme = () => {
+    const stored = localStorage.getItem(storageKey);
+    if (stored === "light" || stored === "dark" || stored === "system") return stored;
+    return defaultTheme;
+  };
+
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -35,13 +39,35 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
+  useEffect(() => {
+    const handleStorage = () => {
+      const storedTheme = localStorage.getItem(storageKey) as Theme;
+      if (storedTheme && storedTheme !== theme) {
+        setTheme(storedTheme);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    handleStorage(); // initial sync
+
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [storageKey, theme]);
+
+  const setAndStoreTheme = useCallback(
+    (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
-  };
+    [storageKey],
+  );
+
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme: setAndStoreTheme,
+    }),
+    [theme, setAndStoreTheme],
+  );
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
@@ -52,8 +78,6 @@ export function ThemeProvider({
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
-
   if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
-
   return context;
 };

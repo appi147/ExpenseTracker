@@ -11,15 +11,15 @@ import {
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function Dialog(props: React.ComponentProps<typeof DialogPrimitiveRoot>) {
+function Dialog(props: Readonly<React.ComponentProps<typeof DialogPrimitiveRoot>>) {
   return <DialogPrimitiveRoot data-slot="dialog" {...props} />;
 }
 
-function DialogTrigger(props: React.ComponentProps<typeof DialogPrimitiveTrigger>) {
+function DialogTrigger(props: Readonly<React.ComponentProps<typeof DialogPrimitiveTrigger>>) {
   return <DialogPrimitiveTrigger data-slot="dialog-trigger" {...props} />;
 }
 
-function DialogPortal(props: React.ComponentProps<typeof DialogPrimitivePortal>) {
+function DialogPortal(props: Readonly<React.ComponentProps<typeof DialogPrimitivePortal>>) {
   return <DialogPrimitivePortal data-slot="dialog-portal" {...props} />;
 }
 

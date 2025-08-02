@@ -1,8 +1,8 @@
 import { Progress } from "@/components/ui/progress";
 
 type Props = {
-  totalExpense: number;
-  monthlyBudget: number;
+  readonly totalExpense: number;
+  readonly monthlyBudget: number;
 };
 
 export default function BudgetProgress({ totalExpense, monthlyBudget }: Props) {

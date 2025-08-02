@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 type Props = {
-  initialMonthly: boolean;
+  readonly initialMonthly: boolean;
 };
 
 export default function ExpenseInsight({ initialMonthly }: Props) {

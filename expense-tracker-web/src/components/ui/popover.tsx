@@ -8,7 +8,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-function Popover(props: React.ComponentProps<typeof PopoverRoot>) {
+function Popover(props: Readonly<React.ComponentProps<typeof PopoverRoot>>) {
   return <PopoverRoot data-slot="popover" {...props} />;
 }
 

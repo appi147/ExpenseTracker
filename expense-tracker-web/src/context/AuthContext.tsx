@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getToken, setToken, clearToken } from "../utils/auth";
+import { getToken, setToken as storeToken, clearToken } from "../utils/auth";
 import { getUserProfile, type ThemeType } from "../services/api";
 import { useTheme } from "@/components/theme-provider";
 
@@ -23,33 +23,45 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setTokenState] = useState<string | null>(getToken());
+  const [token, setToken] = useState<string | null>(getToken());
   const [user, setUser] = useState<User | null>(null);
 
+  const { setTheme } = useTheme(); // ✅ always call hooks at top level
+
   const setAuthToken = (newToken: string) => {
+    storeToken(newToken);
     setToken(newToken);
-    setTokenState(newToken);
   };
 
   const logout = () => {
     clearToken();
-    setTokenState(null);
+    setToken(null);
     setUser(null);
   };
 
+  // Fetch user profile when token is present
   useEffect(() => {
     if (token) {
       getUserProfile()
         .then(setUser)
-        .catch(() => logout());
+        .catch((err) => {
+          console.error("Failed to fetch user profile:", err);
+          logout();
+        });
     }
   }, [token]);
 
-  const { setTheme } = useTheme();
-
+  // Sync theme when user preferredTheme changes
   useEffect(() => {
-    if (user?.preferredTheme) {
-      setTheme(user.preferredTheme.toLowerCase() as "light" | "dark" | "system");
+    const userTheme = user?.preferredTheme?.toLowerCase() as
+      | "light"
+      | "dark"
+      | "system"
+      | undefined;
+    const currentStoredTheme = localStorage.getItem("vite-ui-theme");
+
+    if (userTheme && userTheme !== currentStoredTheme) {
+      setTheme(userTheme);
     }
   }, [user?.preferredTheme, setTheme]);
 

@@ -7,7 +7,7 @@ import {
 import { type CategoryWiseExpense } from "@/services/expense-service";
 
 type Props = {
-  data: CategoryWiseExpense[];
+  readonly data: CategoryWiseExpense[];
 };
 
 export default function CategoryAccordion({ data }: Props) {

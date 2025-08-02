@@ -19,15 +19,15 @@ import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-function DropdownMenu(props: React.ComponentProps<typeof DropdownMenuPrimitiveRoot>) {
+function DropdownMenu(props: Readonly<React.ComponentProps<typeof DropdownMenuPrimitiveRoot>>) {
   return <DropdownMenuPrimitiveRoot data-slot="dropdown-menu" {...props} />;
 }
 
-function DropdownMenuPortal(props: React.ComponentProps<typeof DropdownMenuPrimitivePortal>) {
+function DropdownMenuPortal(props: Readonly<React.ComponentProps<typeof DropdownMenuPrimitivePortal>>) {
   return <DropdownMenuPrimitivePortal data-slot="dropdown-menu-portal" {...props} />;
 }
 
-function DropdownMenuTrigger(props: React.ComponentProps<typeof DropdownMenuPrimitiveTrigger>) {
+function DropdownMenuTrigger(props: Readonly<React.ComponentProps<typeof DropdownMenuPrimitiveTrigger>>) {
   return <DropdownMenuPrimitiveTrigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
@@ -174,7 +174,7 @@ function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"spa
   );
 }
 
-function DropdownMenuSub(props: React.ComponentProps<typeof DropdownMenuPrimitiveSub>) {
+function DropdownMenuSub(props: Readonly<React.ComponentProps<typeof DropdownMenuPrimitiveSub>>) {
   return <DropdownMenuPrimitiveSub data-slot="dropdown-menu-sub" {...props} />;
 }
 

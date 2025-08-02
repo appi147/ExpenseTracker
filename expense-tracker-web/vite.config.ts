@@ -49,4 +49,39 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          radix: [
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-avatar",
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-label",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-progress",
+            "@radix-ui/react-radio-group",
+            "@radix-ui/react-select",
+            "@radix-ui/react-separator",
+            "@radix-ui/react-slot",
+            "@radix-ui/react-switch",
+            "@radix-ui/react-tooltip",
+          ],
+          recharts: ["recharts"],
+          vendor: [
+            "axios",
+            "clsx",
+            "date-fns",
+            "html-to-image",
+            "react-date-range",
+            "react-day-picker",
+            "react-router-dom",
+            "lucide-react",
+          ],
+        },
+      },
+    },
+  },
 });

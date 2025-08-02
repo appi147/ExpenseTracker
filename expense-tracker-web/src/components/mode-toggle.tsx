@@ -10,8 +10,8 @@ import { useTheme } from "@/components/theme-provider";
 import type { ThemeType } from "@/services/api";
 
 interface ModeToggleProps {
-  value: ThemeType;
-  onChange: (theme: ThemeType) => void;
+  readonly value: ThemeType;
+  readonly onChange: (theme: ThemeType) => void;
 }
 
 export function ModeToggle({ value, onChange }: ModeToggleProps) {

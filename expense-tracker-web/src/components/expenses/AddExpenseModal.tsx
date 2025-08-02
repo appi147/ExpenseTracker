@@ -30,17 +30,17 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 interface AddExpenseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onExpenseAdded: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onExpenseAdded: () => void;
 }
 
 export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseModalProps) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [comments, setComments] = useState("");
-  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-  const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined);
+  const [categoryId, setCategoryId] = useState<number>();
+  const [subCategoryId, setSubCategoryId] = useState<number>();
   const [paymentTypeCode, setPaymentTypeCode] = useState("");
 
   const [isAmortized, setIsAmortized] = useState(false);
@@ -52,7 +52,8 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
 
   useEffect(() => {
-    async function loadOptions() {
+    if (!isOpen) return;
+    (async () => {
       try {
         const [paymentData, categoryData] = await Promise.all([
           getAllPaymentTypes(),
@@ -63,30 +64,32 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
       } catch {
         toast.error("Failed to load options");
       }
-    }
-
-    if (isOpen) loadOptions();
+    })();
   }, [isOpen]);
 
   useEffect(() => {
-    async function loadSubCategoryOptions() {
-      if (!categoryId) {
-        setSubCategories([]);
-        return;
-      }
+    if (!categoryId) {
+      setSubCategories([]);
+      return;
+    }
+    (async () => {
       try {
         const data = await getAllSubCategories(categoryId);
         setSubCategories(data);
       } catch {
         toast.error("Failed to load subcategories");
       }
-    }
-
-    loadSubCategoryOptions();
+    })();
   }, [categoryId]);
+
+  const parseFloatSafe = (value: string) => {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!amount || !date || !paymentTypeCode || !subCategoryId) {
       toast.error("Please fill in all required fields.");
       return;
@@ -94,7 +97,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
 
     try {
       await createExpense({
-        amount: parseFloat(amount),
+        amount: parseFloatSafe(amount),
         date,
         comments,
         subCategoryId,
@@ -109,13 +112,23 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
     }
   };
 
+  const isSubmitDisabled =
+    !amount ||
+    !date ||
+    !paymentTypeCode ||
+    !subCategoryId ||
+    categories.length === 0 ||
+    subCategories.length === 0;
+
   return (
     <Dialog open={isOpen} onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Expense</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Date Picker */}
           <div>
             <Label>Date</Label>
             <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
@@ -127,7 +140,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                     !date && "text-muted-foreground",
                   )}
                 >
-                  {date ? format(new Date(date), "PPP") : <span>Pick a date</span>}
+                  {date ? format(new Date(date), "PPP") : "Pick a date"}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -140,10 +153,8 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (selected > today) return;
-                    const year = selected.getFullYear();
-                    const month = String(selected.getMonth() + 1).padStart(2, "0");
-                    const day = String(selected.getDate()).padStart(2, "0");
-                    setDate(`${year}-${month}-${day}`);
+                    const formatted = selected.toISOString().split("T")[0];
+                    setDate(formatted);
                     setIsDatePopoverOpen(false);
                   }}
                   toDate={new Date()}
@@ -153,6 +164,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             </Popover>
           </div>
 
+          {/* Category Select */}
           <div>
             <Label>Category</Label>
             {categories.length === 0 ? (
@@ -164,10 +176,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                 to continue.
               </p>
             ) : (
-              <Select
-                value={categoryId?.toString()}
-                onValueChange={(val) => setCategoryId(parseInt(val))}
-              >
+              <Select value={categoryId?.toString()} onValueChange={(val) => setCategoryId(+val)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
@@ -182,6 +191,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             )}
           </div>
 
+          {/* Subcategory Select */}
           {categoryId &&
             (subCategories.length === 0 ? (
               <p className="text-sm text-muted-foreground">
@@ -189,14 +199,14 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                 <Link to="/sub-categories" className="text-blue-600 underline">
                   Add a subcategory
                 </Link>{" "}
-                under the selected category to continue.
+                to continue.
               </p>
             ) : (
               <div>
                 <Label>Subcategory</Label>
                 <Select
                   value={subCategoryId?.toString()}
-                  onValueChange={(val) => setSubCategoryId(parseInt(val))}
+                  onValueChange={(val) => setSubCategoryId(+val)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a subcategory" />
@@ -212,6 +222,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
               </div>
             ))}
 
+          {/* Amount */}
           <div>
             <Label>Amount</Label>
             <Input
@@ -219,17 +230,16 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
               value={amount}
               onChange={(e) => {
                 const val = e.target.value.replace(/^0+(?!\.|$)/, "");
-                if (/^\d*\.?\d{0,2}$/.test(val)) {
-                  setAmount(val);
-                }
+                if (/^\d*\.?\d{0,2}$/.test(val)) setAmount(val);
               }}
               required
             />
           </div>
 
+          {/* Payment Type */}
           <div>
             <Label>Payment Type</Label>
-            <Select value={paymentTypeCode} onValueChange={(val) => setPaymentTypeCode(val)}>
+            <Select value={paymentTypeCode} onValueChange={setPaymentTypeCode}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a payment method" />
               </SelectTrigger>
@@ -243,6 +253,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             </Select>
           </div>
 
+          {/* Comments */}
           <div>
             <Label>Comments</Label>
             <Input
@@ -252,6 +263,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             />
           </div>
 
+          {/* Amortization */}
           <div className="flex items-center gap-2">
             <Switch checked={isAmortized} onCheckedChange={setIsAmortized} />
             <Label>Amortize this expense</Label>
@@ -275,21 +287,12 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             </div>
           )}
 
+          {/* Actions */}
           <DialogFooter>
             <Button variant="outline" type="button" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={
-                !amount ||
-                !date ||
-                !paymentTypeCode ||
-                !subCategoryId ||
-                categories.length === 0 ||
-                subCategories.length === 0
-              }
-            >
+            <Button type="submit" disabled={isSubmitDisabled}>
               Add Expense
             </Button>
           </DialogFooter>

@@ -2,8 +2,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 type Props = {
-  monthly: boolean;
-  onChange: (val: boolean) => void;
+  readonly monthly: boolean;
+  readonly onChange: (val: boolean) => void;
 };
 
 export default function ToggleDuration({ monthly, onChange }: Props) {
