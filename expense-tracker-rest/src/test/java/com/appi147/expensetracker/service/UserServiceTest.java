@@ -5,8 +5,8 @@ import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.enums.Theme;
 import com.appi147.expensetracker.exception.UnauthorizedException;
-import com.appi147.expensetracker.model.request.BudgetUpdate;
-import com.appi147.expensetracker.model.request.ThemeUpdate;
+import com.appi147.expensetracker.model.request.BudgetUpdateRequest;
+import com.appi147.expensetracker.model.request.ThemeUpdateRequest;
 import com.appi147.expensetracker.model.response.LoginResponse;
 import com.appi147.expensetracker.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -182,7 +182,7 @@ class UserServiceTest {
 
             uc.when(UserContext::getCurrentUser).thenReturn(user);
 
-            BudgetUpdate upd = new BudgetUpdate();
+            BudgetUpdateRequest upd = new BudgetUpdateRequest();
             upd.setAmount(BigDecimal.valueOf(5000));
 
             when(userRepository.saveAndFlush(user)).thenReturn(user);
@@ -206,7 +206,7 @@ class UserServiceTest {
 
             uc.when(UserContext::getCurrentUser).thenReturn(user);
 
-            ThemeUpdate upd = new ThemeUpdate();
+            ThemeUpdateRequest upd = new ThemeUpdateRequest();
             upd.setTheme(Theme.DARK);
 
             when(userRepository.saveAndFlush(user)).thenReturn(user);
@@ -224,7 +224,7 @@ class UserServiceTest {
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(null);
 
-            BudgetUpdate upd = new BudgetUpdate();
+            BudgetUpdateRequest upd = new BudgetUpdateRequest();
             upd.setAmount(BigDecimal.valueOf(100));
 
             NullPointerException ex = assertThrows(NullPointerException.class, () ->
@@ -240,7 +240,7 @@ class UserServiceTest {
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(null);
 
-            ThemeUpdate upd = new ThemeUpdate();
+            ThemeUpdateRequest upd = new ThemeUpdateRequest();
             upd.setTheme(Theme.DARK);
 
             NullPointerException ex = assertThrows(NullPointerException.class, () ->

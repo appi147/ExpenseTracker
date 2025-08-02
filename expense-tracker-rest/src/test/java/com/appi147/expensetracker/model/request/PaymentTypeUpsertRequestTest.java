@@ -8,25 +8,25 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PaymentTypeRequestTest extends ValidationTestBase {
+class PaymentTypeUpsertRequestTest extends ValidationTestBase {
 
     @Test
     void invalidCode_shouldFail() {
-        PaymentTypeRequest req = new PaymentTypeRequest();
+        PaymentTypeUpsertRequest req = new PaymentTypeUpsertRequest();
         req.setCode("pay@type");
         req.setLabel("Pay Type");
 
-        Set<ConstraintViolation<PaymentTypeRequest>> violations = validate(req);
+        Set<ConstraintViolation<PaymentTypeUpsertRequest>> violations = validate(req);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     void validCodeAndLabel_shouldPass() {
-        PaymentTypeRequest req = new PaymentTypeRequest();
+        PaymentTypeUpsertRequest req = new PaymentTypeUpsertRequest();
         req.setCode("CREDIT_CARD");
         req.setLabel("Credit Card");
 
-        Set<ConstraintViolation<PaymentTypeRequest>> violations = validate(req);
+        Set<ConstraintViolation<PaymentTypeUpsertRequest>> violations = validate(req);
         assertTrue(violations.isEmpty());
     }
 }

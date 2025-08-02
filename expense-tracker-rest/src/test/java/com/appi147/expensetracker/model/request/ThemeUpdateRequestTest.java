@@ -9,23 +9,23 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ThemeUpdateTest extends ValidationTestBase {
+class ThemeUpdateRequestTest extends ValidationTestBase {
 
     @Test
     void nullTheme_shouldFail() {
-        ThemeUpdate req = new ThemeUpdate();
+        ThemeUpdateRequest req = new ThemeUpdateRequest();
         req.setTheme(null);
 
-        Set<ConstraintViolation<ThemeUpdate>> violations = validate(req);
+        Set<ConstraintViolation<ThemeUpdateRequest>> violations = validate(req);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     void validTheme_shouldPass() {
-        ThemeUpdate req = new ThemeUpdate();
+        ThemeUpdateRequest req = new ThemeUpdateRequest();
         req.setTheme(Theme.DARK);
 
-        Set<ConstraintViolation<ThemeUpdate>> violations = validate(req);
+        Set<ConstraintViolation<ThemeUpdateRequest>> violations = validate(req);
         assertTrue(violations.isEmpty());
     }
 }

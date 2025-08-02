@@ -26,6 +26,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -40,6 +42,9 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [subCategoryId, setSubCategoryId] = useState<number | undefined>(undefined);
   const [paymentTypeCode, setPaymentTypeCode] = useState("");
+
+  const [isAmortized, setIsAmortized] = useState(false);
+  const [monthsToAmortize, setMonthsToAmortize] = useState("3");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
@@ -94,6 +99,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
         comments,
         subCategoryId,
         paymentTypeCode,
+        monthsToAmortize: isAmortized ? parseInt(monthsToAmortize) : 1,
       });
       toast.success("Expense added successfully");
       onExpenseAdded();
@@ -111,7 +117,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label>Date</label>
+            <Label>Date</Label>
             <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -131,11 +137,9 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                   selected={date ? new Date(date) : undefined}
                   onSelect={(selected) => {
                     if (!selected) return;
-
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (selected > today) return;
-
                     const year = selected.getFullYear();
                     const month = String(selected.getMonth() + 1).padStart(2, "0");
                     const day = String(selected.getDate()).padStart(2, "0");
@@ -150,7 +154,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
           </div>
 
           <div>
-            <label>Category</label>
+            <Label>Category</Label>
             {categories.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No categories found.{" "}
@@ -189,7 +193,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
               </p>
             ) : (
               <div>
-                <label>Subcategory</label>
+                <Label>Subcategory</Label>
                 <Select
                   value={subCategoryId?.toString()}
                   onValueChange={(val) => setSubCategoryId(parseInt(val))}
@@ -209,7 +213,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
             ))}
 
           <div>
-            <label>Amount</label>
+            <Label>Amount</Label>
             <Input
               type="text"
               value={amount}
@@ -224,7 +228,7 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
           </div>
 
           <div>
-            <label>Payment Type</label>
+            <Label>Payment Type</Label>
             <Select value={paymentTypeCode} onValueChange={(val) => setPaymentTypeCode(val)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a payment method" />
@@ -240,13 +244,36 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
           </div>
 
           <div>
-            <label>Comments</label>
+            <Label>Comments</Label>
             <Input
               value={comments}
               onChange={(e) => setComments(e.target.value)}
               placeholder="Optional"
             />
           </div>
+
+          <div className="flex items-center gap-2">
+            <Switch checked={isAmortized} onCheckedChange={setIsAmortized} />
+            <Label>Amortize this expense</Label>
+          </div>
+
+          {isAmortized && (
+            <div>
+              <Label>Amortize Over</Label>
+              <Select value={monthsToAmortize} onValueChange={setMonthsToAmortize}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select months" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 6, 12].map((month) => (
+                    <SelectItem key={month} value={month.toString()}>
+                      {month} {month === 1 ? "month" : "months"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <DialogFooter>
             <Button variant="outline" type="button" onClick={onClose}>

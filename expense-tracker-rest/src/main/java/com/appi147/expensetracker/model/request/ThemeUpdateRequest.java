@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ThemeUpdate {
+public class ThemeUpdateRequest {
     @NotNull(message = "Theme must not be null")
     private Theme theme;
 }

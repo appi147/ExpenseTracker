@@ -11,6 +11,7 @@ export interface CreateExpenseRequest {
   comments?: string;
   subCategoryId: number;
   paymentTypeCode: string;
+  monthsToAmortize: number;
 }
 
 interface FilterParams {

@@ -3,7 +3,7 @@ package com.appi147.expensetracker.service;
 import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.PaymentType;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
-import com.appi147.expensetracker.model.request.PaymentTypeRequest;
+import com.appi147.expensetracker.model.request.PaymentTypeUpsertRequest;
 import com.appi147.expensetracker.repository.PaymentTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class PaymentTypeService {
 
     @PreAuthorize("hasRole('ROLE_SUPER_USER')")
     @CacheEvict(value = "paymentTypes", allEntries = true)
-    public PaymentType create(PaymentTypeRequest request) {
+    public PaymentType create(PaymentTypeUpsertRequest request) {
         var requester = UserContext.getCurrentUser();
         log.info("[PaymentTypeService] User [{}] creating PaymentType: code='{}', label='{}'",
                 requester.getUserId(), request.getCode(), request.getLabel());
@@ -60,7 +60,7 @@ public class PaymentTypeService {
 
     @PreAuthorize("hasRole('ROLE_SUPER_USER')")
     @CacheEvict(value = "paymentTypes", allEntries = true)
-    public PaymentType update(Long id, PaymentTypeRequest request) {
+    public PaymentType update(Long id, PaymentTypeUpsertRequest request) {
         log.info("[PaymentTypeService] Updating PaymentType id={}, new code='{}', new label='{}'",
                 id, request.getCode(), request.getLabel());
 

@@ -9,23 +9,21 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BudgetUpdateTest extends ValidationTestBase {
+class ExpenseAmountPatchRequestTest extends ValidationTestBase {
 
     @Test
-    void invalidAmount_shouldFailValidation() {
-        BudgetUpdate req = new BudgetUpdate();
-        req.setAmount(BigDecimal.ZERO); // invalid
+    void nullAmount_shouldFail() {
+        ExpenseAmountPatchRequest req = new ExpenseAmountPatchRequest(null);
 
-        Set<ConstraintViolation<BudgetUpdate>> violations = validate(req);
+        Set<ConstraintViolation<ExpenseAmountPatchRequest>> violations = validate(req);
         assertFalse(violations.isEmpty());
     }
 
     @Test
     void validAmount_shouldPass() {
-        BudgetUpdate req = new BudgetUpdate();
-        req.setAmount(new BigDecimal("100.00"));
+        ExpenseAmountPatchRequest req = new ExpenseAmountPatchRequest(new BigDecimal("500.00"));
 
-        Set<ConstraintViolation<BudgetUpdate>> violations = validate(req);
+        Set<ConstraintViolation<ExpenseAmountPatchRequest>> violations = validate(req);
         assertTrue(violations.isEmpty());
     }
 }

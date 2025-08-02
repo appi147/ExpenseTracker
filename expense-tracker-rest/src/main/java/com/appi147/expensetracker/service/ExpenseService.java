@@ -7,7 +7,7 @@ import com.appi147.expensetracker.entity.SubCategory;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
-import com.appi147.expensetracker.model.request.CreateExpenseRequest;
+import com.appi147.expensetracker.model.request.ExpenseCreateRequest;
 import com.appi147.expensetracker.model.response.CategoryWiseExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpenseInsight;
@@ -24,8 +24,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -40,24 +42,66 @@ public class ExpenseService {
     private final PaymentTypeService paymentTypeService;
     private final SubCategoryService subCategoryService;
 
-    public void addExpense(CreateExpenseRequest request) {
+    public void addExpense(ExpenseCreateRequest request) {
         User user = UserContext.getCurrentUser();
-        log.info("[ExpenseService] User [{}] adding expense: amount={}, date={}, subCategoryId={}, paymentTypeCode={}",
-                user.getUserId(), request.getAmount(), request.getDate(), request.getSubCategoryId(), request.getPaymentTypeCode());
+        log.info("[ExpenseService] User [{}] adding expense: amount={}, date={}, subCategoryId={}, paymentTypeCode={}, monthsToAmortize={}",
+                user.getUserId(), request.getAmount(), request.getDate(), request.getSubCategoryId(), request.getPaymentTypeCode(),
+                request.getMonthsToAmortize());
 
         SubCategory subCategory = subCategoryService.getSubCategory(request.getSubCategoryId());
         PaymentType paymentType = paymentTypeService.getByCode(request.getPaymentTypeCode());
 
-        Expense expense = new Expense();
-        expense.setAmount(request.getAmount());
-        expense.setDate(request.getDate());
-        expense.setComments(request.getComments());
-        expense.setSubCategory(subCategory);
-        expense.setPaymentType(paymentType);
-        expense.setCreatedBy(user);
+        if (request.getMonthsToAmortize().getMonths() > 1) {
+            List<Expense> amortizedExpenses = createAmortizedExpenses(request, subCategory, paymentType, user);
+            expenseRepository.saveAllAndFlush(amortizedExpenses);
+            log.info("[ExpenseService] {} amortized expenses created for user {}", amortizedExpenses.size(), user.getUserId());
+        } else {
+            Expense expense = new Expense();
+            expense.setAmount(request.getAmount());
+            expense.setDate(request.getDate());
+            expense.setComments(request.getComments());
+            expense.setSubCategory(subCategory);
+            expense.setPaymentType(paymentType);
+            expense.setCreatedBy(user);
 
-        expenseRepository.saveAndFlush(expense);
-        log.info("[ExpenseService] Expense created: id={}, userId={}", expense.getExpenseId(), user.getUserId());
+            expenseRepository.saveAndFlush(expense);
+            log.info("[ExpenseService] Expense created: id={}, userId={}", expense.getExpenseId(), user.getUserId());
+        }
+    }
+
+    private List<Expense> createAmortizedExpenses(
+            ExpenseCreateRequest request, SubCategory subCategory,
+            PaymentType paymentType, User user
+    ) {
+        int months = request.getMonthsToAmortize().getMonths();
+        BigDecimal totalAmount = request.getAmount();
+        BigDecimal monthlyAmount = totalAmount.divide(BigDecimal.valueOf(months), 2, RoundingMode.DOWN);
+        BigDecimal lastMonthAmount = totalAmount.subtract(monthlyAmount.multiply(BigDecimal.valueOf(months - 1)));
+
+        List<Expense> expenses = new ArrayList<>();
+
+        LocalDate startDate = request.getDate();
+        for (int i = 0; i < months; i++) {
+            LocalDate date = adjustToValidDate(startDate.plusMonths(i));
+
+            Expense expense = new Expense();
+            expense.setAmount(i == months - 1 ? lastMonthAmount : monthlyAmount);
+            expense.setDate(date);
+            expense.setComments(request.getComments() + " (Part " + (i + 1) + "/" + months + ")");
+            expense.setSubCategory(subCategory);
+            expense.setPaymentType(paymentType);
+            expense.setCreatedBy(user);
+
+            expenses.add(expense);
+        }
+
+        return expenses;
+    }
+
+    private LocalDate adjustToValidDate(LocalDate date) {
+        int lastDay = YearMonth.of(date.getYear(), date.getMonth()).lengthOfMonth();
+        int day = Math.min(date.getDayOfMonth(), lastDay);
+        return LocalDate.of(date.getYear(), date.getMonth(), day);
     }
 
     public MonthlyExpense getCurrentMonthExpense() {

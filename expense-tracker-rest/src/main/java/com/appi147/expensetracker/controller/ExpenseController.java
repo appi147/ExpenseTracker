@@ -1,8 +1,8 @@
 package com.appi147.expensetracker.controller;
 
 import com.appi147.expensetracker.entity.Expense;
-import com.appi147.expensetracker.model.request.CreateExpenseRequest;
-import com.appi147.expensetracker.model.request.EditExpenseAmount;
+import com.appi147.expensetracker.model.request.ExpenseCreateRequest;
+import com.appi147.expensetracker.model.request.ExpenseAmountPatchRequest;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpenseInsight;
 import com.appi147.expensetracker.model.response.PagedResponse;
@@ -62,7 +62,7 @@ public class ExpenseController {
      */
     @PostMapping("/create")
     @Operation(summary = "Create a new expense")
-    public ResponseEntity<Void> createExpense(@Valid @RequestBody CreateExpenseRequest request) {
+    public ResponseEntity<Void> createExpense(@Valid @RequestBody ExpenseCreateRequest request) {
         expenseService.addExpense(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -114,8 +114,8 @@ public class ExpenseController {
      */
     @PutMapping("/{expenseId}/amount")
     @Operation(summary = "Update the amount of an expense")
-    public ResponseEntity<Void> updateExpenseAmount(@PathVariable Long expenseId, @Valid @RequestBody EditExpenseAmount editExpenseAmount) {
-        expenseService.updateExpenseAmount(expenseId, editExpenseAmount.getAmount());
+    public ResponseEntity<Void> updateExpenseAmount(@PathVariable Long expenseId, @Valid @RequestBody ExpenseAmountPatchRequest expenseAmountPatchRequest) {
+        expenseService.updateExpenseAmount(expenseId, expenseAmountPatchRequest.getAmount());
         return ResponseEntity.ok().build();
     }
 }

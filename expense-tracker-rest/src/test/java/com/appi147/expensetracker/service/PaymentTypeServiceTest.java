@@ -4,7 +4,7 @@ import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.PaymentType;
 import com.appi147.expensetracker.entity.User;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
-import com.appi147.expensetracker.model.request.PaymentTypeRequest;
+import com.appi147.expensetracker.model.request.PaymentTypeUpsertRequest;
 import com.appi147.expensetracker.repository.PaymentTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -104,7 +104,7 @@ class PaymentTypeServiceTest {
 
     @Test
     void create_success_savesAndReturnsNewPaymentType() {
-        PaymentTypeRequest req = mock(PaymentTypeRequest.class);
+        PaymentTypeUpsertRequest req = mock(PaymentTypeUpsertRequest.class);
         when(req.getCode()).thenReturn("WALLET");
         when(req.getLabel()).thenReturn("Wallet");
 
@@ -144,7 +144,7 @@ class PaymentTypeServiceTest {
 
     @Test
     void update_successUpdatesAndReturnsType() {
-        PaymentTypeRequest req = mock(PaymentTypeRequest.class);
+        PaymentTypeUpsertRequest req = mock(PaymentTypeUpsertRequest.class);
         when(req.getCode()).thenReturn("NET");
         when(req.getLabel()).thenReturn("Internet Banking");
 
@@ -181,7 +181,7 @@ class PaymentTypeServiceTest {
 
     @Test
     void update_notFound_throwsResourceNotFoundException() {
-        PaymentTypeRequest req = mock(PaymentTypeRequest.class);
+        PaymentTypeUpsertRequest req = mock(PaymentTypeUpsertRequest.class);
         when(paymentTypeRepository.findById(777L)).thenReturn(Optional.empty());
 
         ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class,

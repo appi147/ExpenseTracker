@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class PaymentTypeRequest {
+public class PaymentTypeUpsertRequest {
 
     @NotBlank(message = "Code cannot be blank")
     @Size(max = 50, message = "Code must not exceed 50 characters")

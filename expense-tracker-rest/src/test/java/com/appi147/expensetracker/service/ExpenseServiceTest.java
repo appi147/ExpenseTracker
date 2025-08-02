@@ -2,9 +2,10 @@ package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.UserContext;
 import com.appi147.expensetracker.entity.*;
+import com.appi147.expensetracker.enums.AmortizationPeriod;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
-import com.appi147.expensetracker.model.request.CreateExpenseRequest;
+import com.appi147.expensetracker.model.request.ExpenseCreateRequest;
 import com.appi147.expensetracker.model.response.CategoryWiseExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpense;
 import com.appi147.expensetracker.model.response.MonthlyExpenseInsight;
@@ -53,12 +54,13 @@ class ExpenseServiceTest {
         subCat.setSubCategoryId(2L);
         PaymentType pt = new PaymentType();
         pt.setCode("CARD");
-        CreateExpenseRequest req = new CreateExpenseRequest();
+        ExpenseCreateRequest req = new ExpenseCreateRequest();
         req.setAmount(new BigDecimal("123.45"));
         req.setDate(LocalDate.now());
         req.setComments("Some info");
         req.setSubCategoryId(2L);
         req.setPaymentTypeCode("CARD");
+        req.setMonthsToAmortize(AmortizationPeriod.fromValue(1));
 
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(user);
@@ -68,7 +70,6 @@ class ExpenseServiceTest {
 
             ArgumentCaptor<Expense> expenseCaptor = ArgumentCaptor.forClass(Expense.class);
             when(expenseRepository.saveAndFlush(expenseCaptor.capture())).thenAnswer(inv -> {
-                // Simulate setting an ID to imitate persistence
                 Expense e = expenseCaptor.getValue();
                 e.setExpenseId(99L);
                 return e;
@@ -88,8 +89,45 @@ class ExpenseServiceTest {
     }
 
     @Test
+    void addExpense_amortized_splitsAmountCorrectly() {
+        User user = new User();
+        user.setUserId("U1");
+        SubCategory subCat = new SubCategory();
+        PaymentType pt = new PaymentType();
+        ExpenseCreateRequest req = new ExpenseCreateRequest();
+        req.setAmount(new BigDecimal("100.00"));
+        req.setDate(LocalDate.of(2025, 8, 1));
+        req.setComments("EMI");
+        req.setSubCategoryId(1L);
+        req.setPaymentTypeCode("CARD");
+        req.setMonthsToAmortize(AmortizationPeriod.fromValue(3));
+
+        try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
+            uc.when(UserContext::getCurrentUser).thenReturn(user);
+            when(subCategoryService.getSubCategory(1L)).thenReturn(subCat);
+            when(paymentTypeService.getByCode("CARD")).thenReturn(pt);
+
+            ArgumentCaptor<List<Expense>> captor = ArgumentCaptor.forClass(List.class);
+            when(expenseRepository.saveAllAndFlush(captor.capture())).thenReturn(null);
+
+            expenseService.addExpense(req);
+
+            List<Expense> saved = captor.getValue();
+            assertEquals(3, saved.size());
+            assertEquals(new BigDecimal("33.33"), saved.get(0).getAmount());
+            assertEquals(new BigDecimal("33.33"), saved.get(1).getAmount());
+            assertEquals(new BigDecimal("33.34"), saved.get(2).getAmount());
+
+            assertEquals("EMI (Part 1/3)", saved.get(0).getComments());
+            assertEquals("EMI (Part 2/3)", saved.get(1).getComments());
+            assertEquals("EMI (Part 3/3)", saved.get(2).getComments());
+        }
+    }
+
+    @Test
     void addExpense_nullUser_throwsNPE() {
-        CreateExpenseRequest req = new CreateExpenseRequest();
+        ExpenseCreateRequest req = new ExpenseCreateRequest();
+        req.setMonthsToAmortize(AmortizationPeriod.fromValue(1));
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(null);
             assertThrows(NullPointerException.class, () -> expenseService.addExpense(req));
@@ -100,8 +138,9 @@ class ExpenseServiceTest {
     void addExpense_subCategoryServiceThrows_propagates() {
         User user = new User();
         user.setUserId("u");
-        CreateExpenseRequest req = new CreateExpenseRequest();
+        ExpenseCreateRequest req = new ExpenseCreateRequest();
         req.setSubCategoryId(99L);
+        req.setMonthsToAmortize(AmortizationPeriod.fromValue(1));
 
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(user);
@@ -115,8 +154,9 @@ class ExpenseServiceTest {
     void addExpense_paymentTypeServiceThrows_propagates() {
         User user = new User();
         user.setUserId("u");
-        CreateExpenseRequest req = new CreateExpenseRequest();
+        ExpenseCreateRequest req = new ExpenseCreateRequest();
         req.setPaymentTypeCode("unknown");
+        req.setMonthsToAmortize(AmortizationPeriod.fromValue(1));
 
         try (MockedStatic<UserContext> uc = mockStatic(UserContext.class)) {
             uc.when(UserContext::getCurrentUser).thenReturn(user);

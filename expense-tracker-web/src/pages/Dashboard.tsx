@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
 import ToggleDuration from "@/components/insights/ToggleDuration";
+import { Plus, Repeat, CalendarClock, IndianRupee } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Dashboard = () => {
   const [last30DaysTotal, setLast30DaysTotal] = useState<number | null>(null);
   const [showLast30Days, setShowLast30Days] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [showFabOptions, setShowFabOptions] = useState(false);
 
   const loadExpenses = async () => {
     try {
@@ -22,6 +24,16 @@ const Dashboard = () => {
       console.error("Failed to fetch monthly total:", err);
     }
   };
+
+  function formatExpenseAmount(
+    showLast30Days: boolean,
+    monthlyTotal: number | null,
+    last30DaysTotal: number | null,
+  ): string {
+    const amount = showLast30Days ? last30DaysTotal : monthlyTotal;
+    if (amount === null) return "Loading...";
+    return amount.toFixed(2);
+  }
 
   useEffect(() => {
     loadExpenses();
@@ -48,10 +60,15 @@ const Dashboard = () => {
       description: "Visualize spending patterns via charts",
       onClick: () => navigate("/expenses/trends"),
     },
+    {
+      label: "Recurring Expense",
+      description: "Set up expenses that repeat automatically",
+      onClick: () => navigate("/expenses/recurring"),
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
       <div className="p-6 max-w-5xl mx-auto">
         <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
 
@@ -62,14 +79,7 @@ const Dashboard = () => {
                 {showLast30Days ? "Last 30 Days Total Expense" : "This Month’s Total Expense"}
               </p>
               <h3 className="text-2xl font-bold">
-                ₹
-                {showLast30Days
-                  ? last30DaysTotal !== null
-                    ? last30DaysTotal.toFixed(2)
-                    : "Loading..."
-                  : monthlyTotal !== null
-                    ? monthlyTotal.toFixed(2)
-                    : "Loading..."}
+                ₹{formatExpenseAmount(showLast30Days, monthlyTotal, last30DaysTotal)}
               </h3>
             </div>
 
@@ -88,7 +98,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {options.map((opt) => (
             <Card key={opt.label} className="hover:shadow-md transition">
               <CardContent className="p-4">
@@ -101,6 +111,51 @@ const Dashboard = () => {
             </Card>
           ))}
         </div>
+      </div>
+
+      <div className="md:hidden">
+        {showFabOptions && (
+          <div className="fixed bottom-20 right-4 flex flex-col gap-2 z-50">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsAddExpenseOpen(true);
+                setShowFabOptions(false);
+              }}
+              className="flex items-center gap-2"
+            >
+              <IndianRupee size={16} /> Add Expense
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                navigate("/expenses/amortized");
+                setShowFabOptions(false);
+              }}
+              className="flex items-center gap-2"
+            >
+              <CalendarClock size={16} /> Amortized
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                navigate("/expenses/recurring");
+                setShowFabOptions(false);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Repeat size={16} /> Recurring
+            </Button>
+          </div>
+        )}
+
+        <Button
+          variant="default"
+          className="fixed bottom-4 right-4 rounded-full p-3 z-50 shadow-lg"
+          onClick={() => setShowFabOptions((prev) => !prev)}
+        >
+          <Plus size={24} />
+        </Button>
       </div>
 
       <AddExpenseModal

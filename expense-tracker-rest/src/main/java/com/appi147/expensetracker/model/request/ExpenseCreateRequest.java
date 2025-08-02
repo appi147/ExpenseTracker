@@ -1,5 +1,7 @@
 package com.appi147.expensetracker.model.request;
 
+import com.appi147.expensetracker.enums.AmortizationPeriod;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -7,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class CreateExpenseRequest {
+public class ExpenseCreateRequest {
 
     @NotNull(message = "Amount cannot be null")
     @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be greater than 0")
@@ -28,4 +30,12 @@ public class CreateExpenseRequest {
     @NotNull(message = "PaymentTypeCode cannot be null")
     @Pattern(regexp = "^[A-Z_]+$", message = "PaymentTypeCode must be uppercase and may contain underscores only")
     private String paymentTypeCode;
+
+    @NotNull(message = "Months to Amortize can't be null")
+    @Schema(
+            description = "Number of months over which the expense is amortized",
+            example = "1",
+            defaultValue = "1"
+    )
+    private AmortizationPeriod monthsToAmortize;
 }
