@@ -22,11 +22,7 @@ public class GoogleTokenVerifier {
     }
 
     public GoogleIdToken.Payload verify(String idTokenString) throws GeneralSecurityException, IOException {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
-                new GooglePublicKeysManager.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance())
-                        .build())
-                .setAudience(Collections.singletonList(clientId))
-                .build();
+        GoogleIdTokenVerifier verifier = buildVerifier();
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
         if (idToken != null) {
@@ -35,4 +31,13 @@ public class GoogleTokenVerifier {
             throw new IllegalArgumentException("Invalid ID token.");
         }
     }
+
+    protected GoogleIdTokenVerifier buildVerifier() throws GeneralSecurityException, IOException {
+        return new GoogleIdTokenVerifier.Builder(
+                new GooglePublicKeysManager.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance())
+                        .build())
+                .setAudience(Collections.singletonList(clientId))
+                .build();
+    }
 }
+

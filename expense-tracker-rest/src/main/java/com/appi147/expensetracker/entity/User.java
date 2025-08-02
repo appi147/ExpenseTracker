@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 @Getter
 @Setter
 public class User extends Auditable {

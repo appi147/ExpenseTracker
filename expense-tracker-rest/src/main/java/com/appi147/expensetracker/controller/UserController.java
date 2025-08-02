@@ -22,7 +22,7 @@ public class UserController {
 
     @Operation(summary = "Login with Google", description = "Authenticates a user using Google OAuth token.")
     @PostMapping("/login")
-    public ResponseEntity<?> loginWithGoogle(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> loginWithGoogle(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
         }
