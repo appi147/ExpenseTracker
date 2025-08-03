@@ -36,6 +36,15 @@ jobs:
         run: |
           cd expense-tracker-web
           npm ci
+
+      - name: Run frontend tests and coverage
+        run: |
+          cd expense-tracker-web
+          npm run test:coverage
+
+      - name: Build frontend
+        run: |
+          cd expense-tracker-web
           npm run build
 
       - name: SonarQube Scan
