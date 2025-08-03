@@ -259,7 +259,7 @@ export default function Expenses() {
           Page {page + 1} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
-          <label className="text-sm text-muted-foreground">Rows per page:</label>
+          <Label className="text-sm text-muted-foreground">Rows per page:</Label>
           <Select
             value={pageSize.toString()}
             onValueChange={(val) => {

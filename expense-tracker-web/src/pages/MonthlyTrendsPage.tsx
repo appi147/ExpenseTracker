@@ -54,10 +54,11 @@ export default function MonthlyExpenseTrends() {
           const isHidden = hiddenLines[key];
 
           return (
-            <span
+            <Button
               key={key}
+              variant="ghost"
               onClick={() => handleLegendClick({ dataKey: key })}
-              className={`cursor-pointer text-sm flex items-center gap-1 px-2 py-1 rounded ${
+              className={`h-auto px-2 py-1 text-sm flex items-center gap-1 rounded ${
                 isHidden ? "line-through opacity-50" : "font-medium"
               }`}
             >
@@ -66,7 +67,7 @@ export default function MonthlyExpenseTrends() {
                 style={{ backgroundColor: entry.color }}
               />
               {key}
-            </span>
+            </Button>
           );
         })}
       </div>

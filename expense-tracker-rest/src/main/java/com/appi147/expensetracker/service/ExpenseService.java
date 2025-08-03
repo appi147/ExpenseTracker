@@ -73,7 +73,7 @@ public class ExpenseService {
             ExpenseCreateRequest request, SubCategory subCategory,
             PaymentType paymentType, User user
     ) {
-        int months = request.getMonthsToAmortize().getMonths();
+        long months = request.getMonthsToAmortize().getMonths();
         BigDecimal totalAmount = request.getAmount();
         BigDecimal monthlyAmount = totalAmount.divide(BigDecimal.valueOf(months), 2, RoundingMode.DOWN);
         BigDecimal lastMonthAmount = totalAmount.subtract(monthlyAmount.multiply(BigDecimal.valueOf(months - 1)));

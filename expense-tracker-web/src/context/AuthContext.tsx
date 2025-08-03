@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getToken, setToken as storeToken, clearToken } from "../utils/auth";
 import { getUserProfile, type ThemeType } from "../services/api";
 import { useTheme } from "@/components/theme-provider";
@@ -13,20 +13,20 @@ interface User {
 }
 
 interface AuthContextType {
-  token: string | null;
-  setAuthToken: (token: string) => void;
-  logout: () => void;
-  user: User | null;
-  setUser: (user: User | null) => void;
+  readonly token: string | null;
+  readonly setAuthToken: (token: string) => void;
+  readonly logout: () => void;
+  readonly user: User | null;
+  readonly setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: { readonly children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(getToken());
   const [user, setUser] = useState<User | null>(null);
 
-  const { setTheme } = useTheme(); // ✅ always call hooks at top level
+  const { setTheme } = useTheme();
 
   const setAuthToken = (newToken: string) => {
     storeToken(newToken);
@@ -39,7 +39,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  // Fetch user profile when token is present
   useEffect(() => {
     if (token) {
       getUserProfile()
@@ -51,7 +50,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [token]);
 
-  // Sync theme when user preferredTheme changes
   useEffect(() => {
     const userTheme = user?.preferredTheme?.toLowerCase() as
       | "light"
@@ -65,14 +63,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [user?.preferredTheme, setTheme]);
 
-  return (
-    <AuthContext.Provider value={{ token, setAuthToken, logout, user, setUser }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo<AuthContextType>(
+    () => ({
+      token,
+      setAuthToken,
+      logout,
+      user,
+      setUser,
+    }),
+    [token, user]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;

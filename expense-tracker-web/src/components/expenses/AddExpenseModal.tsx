@@ -53,6 +53,11 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
 
   useEffect(() => {
     if (!isOpen) return;
+    setAmount("");
+    setComments("");
+    setIsAmortized(false);
+    setPaymentTypeCode("");
+    setDate(new Date().toISOString().split("T")[0]);
     (async () => {
       try {
         const [paymentData, categoryData] = await Promise.all([

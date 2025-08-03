@@ -8,6 +8,11 @@ import java.time.LocalDate;
 
 public class ExpenseSpecification {
 
+    // Private constructor to prevent instantiation
+    private ExpenseSpecification() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     public static Specification<Expense> filter(
             String userId,
             Long categoryId,

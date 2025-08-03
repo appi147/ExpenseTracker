@@ -6,6 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class UserContext {
+
+    private UserContext() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     public static User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
