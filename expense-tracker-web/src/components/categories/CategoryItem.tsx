@@ -100,49 +100,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
     }
   };
 
-  return category.deletable ? (
-    <div className="flex items-center justify-between py-2 border-b">
-      {editingCategoryId === category.categoryId ? (
-        <div className="flex items-center gap-2">
-          <Input
-            value={editingLabel}
-            onChange={(e) => setEditingLabel(e.target.value)}
-            className="w-64"
-          />
-          <Button size="sm" onClick={handleCategoryUpdate}>
-            Save
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setEditingCategoryId(null)}>
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
-            <FolderIcon className="w-4 h-4" />
-            <span>{category.label}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-5 w-5"
-              onClick={() => {
-                setEditingCategoryId(category.categoryId);
-                setEditingLabel(category.label);
-              }}
-            >
-              <Pencil className="w-4 h-4 text-muted-foreground" />
-            </Button>
-          </div>
-
-          {category.deletable && (
-            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCategoryDelete}>
-              <Trash2 className="w-4 h-4 text-destructive" />
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  ) : (
+  return (
     <AccordionItem value={String(category.categoryId)}>
       <AccordionTrigger
         className="text-xl font-semibold no-underline hover:no-underline"
@@ -151,40 +109,72 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
           if (!open) loadSubcategories();
         }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full">
           {editingCategoryId === category.categoryId ? (
-            <>
+            <div className="flex items-center gap-2">
               <Input
                 value={editingLabel}
                 onChange={(e) => setEditingLabel(e.target.value)}
                 className="w-64"
+                onClick={(e) => e.stopPropagation()}
               />
-              <Button size="sm" onClick={handleCategoryUpdate}>
-                Save
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setEditingCategoryId(null)}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <FolderIcon className="w-4 h-4" />
-              <span>{category.label}</span>
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-2 w-2"
-                onClick={() => {
-                  setEditingCategoryId(category.categoryId);
-                  setEditingLabel(category.label);
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCategoryUpdate();
                 }}
               >
-                <Pencil className="w-2 h-2 text-muted-foreground" />
+                Save
               </Button>
-            </>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingCategoryId(null);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <FolderIcon className="w-4 h-4" />
+                <span>{category.label}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingCategoryId(category.categoryId);
+                    setEditingLabel(category.label);
+                  }}
+                >
+                  <Pencil className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              </div>
+
+              {category.deletable && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCategoryDelete();
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </AccordionTrigger>
+
       <AccordionContent>
         <div className="space-y-2">
           {subcategories.map((sub) => (
