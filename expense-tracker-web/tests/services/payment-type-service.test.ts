@@ -1,9 +1,18 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as svc from '../../src/services/payment-type-service'
+import API from '../../src/services/api'
 
-import * as Module from '../../src/services/payment-type-service'
+describe('services/payment-type-service', () => {
+  beforeEach(() => {
+    // @ts-expect-error
+    API.get = vi.fn()
+  })
 
-describe('payment-type-service.ts', () => {
-  it('should have tests', () => {
-    expect(true).toBe(true)
+  it('getAllPaymentTypes GETs and returns data', async () => {
+    // @ts-expect-error
+    API.get.mockResolvedValue({ data: [{ code: 'CASH', label: 'Cash' }] })
+    const res = await svc.getAllPaymentTypes()
+    expect(API.get).toHaveBeenCalledWith('/payment-types')
+    expect(res[0].code).toBe('CASH')
   })
 })

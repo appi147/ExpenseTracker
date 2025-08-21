@@ -1,9 +1,26 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as svc from '../../src/services/insight-service'
+import API from '../../src/services/api'
 
-import * as Module from '../../src/services/insight-service'
+describe('services/insight-service', () => {
+  beforeEach(() => {
+    // @ts-expect-error
+    API.get = vi.fn()
+  })
 
-describe('insight-service.ts', () => {
-  it('should have tests', () => {
-    expect(true).toBe(true)
+  it('getInsight calls /insights/site-wide', async () => {
+    // @ts-expect-error
+    API.get.mockResolvedValue({ data: { totalUsersRegistered: 1 } })
+    const res = await svc.getInsight()
+    expect(API.get).toHaveBeenCalledWith('/insights/site-wide')
+    expect(res.totalUsersRegistered).toBe(1)
+  })
+
+  it('getMonthlyTrends calls /insights/monthly-trends', async () => {
+    // @ts-expect-error
+    API.get.mockResolvedValue({ data: [] })
+    const res = await svc.getMonthlyTrends()
+    expect(API.get).toHaveBeenCalledWith('/insights/monthly-trends')
+    expect(res).toEqual([])
   })
 })

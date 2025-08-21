@@ -1,9 +1,13 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import * as Module from '../../../src/components/insights/ToggleDuration'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import ToggleDuration from '../../../src/components/insights/ToggleDuration'
 
-describe('ToggleDuration.tsx', () => {
-  it('should have tests', () => {
-    expect(true).toBe(true)
+describe('components/insights/ToggleDuration', () => {
+  it('renders and triggers onChange', () => {
+    const onChange = vi.fn()
+    render(<ToggleDuration monthly={true} onChange={onChange} />)
+    const sw = screen.getByRole('switch')
+    fireEvent.click(sw)
+    expect(onChange).toHaveBeenCalled()
   })
 })

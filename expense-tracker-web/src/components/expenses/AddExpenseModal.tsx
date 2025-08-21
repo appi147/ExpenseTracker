@@ -234,8 +234,9 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
 
           {/* Amount */}
           <div>
-            <Label>Amount</Label>
+            <Label htmlFor="amount">Amount</Label>
             <Input
+              id="amount"
               type="text"
               value={amount}
               onChange={(e) => {
