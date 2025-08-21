@@ -158,12 +158,17 @@ export function AddExpenseModal({ isOpen, onClose, onExpenseAdded }: AddExpenseM
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (selected > today) return;
-                    const formatted = selected.toISOString().split("T")[0];
+
+                    // Timezone-safe formatting
+                    const year = selected.getFullYear();
+                    const month = String(selected.getMonth() + 1).padStart(2, "0");
+                    const day = String(selected.getDate()).padStart(2, "0");
+                    const formatted = `${year}-${month}-${day}`;
+
                     setDate(formatted);
                     setIsDatePopoverOpen(false);
                   }}
-                  toDate={new Date()}
-                  initialFocus
+                  disabled={{ after: new Date() }}
                 />
               </PopoverContent>
             </Popover>
