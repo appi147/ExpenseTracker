@@ -21,6 +21,9 @@ public class ExpenseSpecification {
             LocalDate dateFrom,
             LocalDate dateTo
     ) {
+        final LocalDate effectiveDateTo = (dateTo != null)
+                ? dateTo
+                : LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
         return (root, query, cb) -> {
             Predicate predicate = cb.equal(root.get("createdBy").get("id"), userId);
 
@@ -48,13 +51,12 @@ public class ExpenseSpecification {
                 );
             }
 
-            if (dateTo != null) {
-                predicate = cb.and(predicate,
-                        cb.lessThanOrEqualTo(root.get("date"), dateTo)
-                );
-            }
+            predicate = cb.and(predicate,
+                    cb.lessThanOrEqualTo(root.get("date"), effectiveDateTo)
+            );
 
             return predicate;
         };
     }
+
 }

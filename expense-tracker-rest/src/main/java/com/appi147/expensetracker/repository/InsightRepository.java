@@ -5,7 +5,7 @@ import com.appi147.expensetracker.model.response.SiteWideInsight;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface InsightRepository extends JpaRepository<User, Long> {
+public interface InsightRepository extends JpaRepository<User, String> {
 
     @Query("""
               SELECT new com.appi147.expensetracker.model.response.SiteWideInsight(

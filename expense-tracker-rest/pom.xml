@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.4</version>
+        <version>3.5.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.appi147</groupId>
@@ -17,6 +17,7 @@
         <java.version>21</java.version>
         <sonar.organization>appi147</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.exclusions>**/entity/**</sonar.coverage.exclusions>
     </properties>
     <developers>
         <developer>
@@ -96,7 +97,7 @@
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
-            <version>4.0.7</version>
+            <version>4.0.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,6 +153,12 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.13</version>
+                <configuration>
+                    <excludes>
+                        <!-- Exclude all entity classes -->
+                        <exclude>**/entity/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
