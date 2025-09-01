@@ -5,26 +5,38 @@ updates:
     directory: "/expense-tracker-web"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     rebase-strategy: "auto"
     assignees:
       - "appi147"
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   # Backend - Java + Maven
   - package-ecosystem: "maven"
     directory: "/expense-tracker-rest"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     rebase-strategy: "auto"
     assignees:
       - "appi147"
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   # CI/CD - GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/.github/workflows"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     assignees:
       - "appi147"
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
