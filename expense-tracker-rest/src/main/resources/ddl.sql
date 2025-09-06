@@ -59,3 +59,18 @@ CREATE TABLE expense (
 ALTER TABLE user ADD COLUMN budget NUMERIC(19, 2) DEFAULT 0;
 
 ALTER TABLE user ADD COLUMN preferred_theme VARCHAR(10) NOT NULL DEFAULT 'SYSTEM';
+
+CREATE TABLE recurring_expense (
+    recurring_expense_id BIGSERIAL PRIMARY KEY,
+    amount NUMERIC(19, 2) NOT NULL,
+    day_of_month INT NOT NULL CHECK (day_of_month >= 1 AND day_of_month <= 28),
+    comments VARCHAR(500),
+    user_id VARCHAR(255) NOT NULL,
+    payment_type_id BIGINT NOT NULL,
+    sub_category_id BIGINT NOT NULL,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    CONSTRAINT fk_recurring_expense_user FOREIGN KEY (user_id) REFERENCES user(user_id),
+    CONSTRAINT fk_recurring_expense_payment_type FOREIGN KEY (payment_type_id) REFERENCES payment_type(id),
+    CONSTRAINT fk_recurring_expense_sub_category FOREIGN KEY (sub_category_id) REFERENCES sub_category(sub_cat_id)
+);

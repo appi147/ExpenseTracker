@@ -1,45 +1,45 @@
 package com.appi147.expensetracker.exception;
 
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/dummy")
 public class DummyController {
 
-    @PostMapping
-    public ResponseEntity<String> validate(@Valid @RequestBody DummyRequest request) {
-        return ResponseEntity.ok("Valid");
-    }
-
     @PostMapping("/not-found")
-    public void notFound() {
+    public void throwNotFound() {
         throw new ResourceNotFoundException("Resource not found");
     }
 
+    @PostMapping("/bad-request")
+    public void throwBadRequest() {
+        throw new BadRequestException("Bad request");
+    }
+
     @PostMapping("/unauthorized")
-    public void unauthorized() {
+    public void throwUnauthorized() {
         throw new UnauthorizedException("Unauthorized access");
     }
 
+    @PostMapping("/forbidden")
+    public void throwForbidden() {
+        throw new ForbiddenException("Forbidden action");
+    }
+
     @PostMapping("/access-denied")
-    public void accessDenied() {
+    public void throwAccessDenied() {
         throw new AccessDeniedException("Access denied");
     }
 
     @PostMapping("/no-credentials")
-    public void noCredentials() {
-        throw new AuthenticationCredentialsNotFoundException("Missing creds");
+    public void throwNoCredentials() {
+        throw new AuthenticationCredentialsNotFoundException("No credentials");
     }
 
     @PostMapping("/generic-error")
-    public void genericError() {
-        throw new RuntimeException("Unexpected error");
+    public void throwGeneric() throws Exception {
+        throw new Exception("Generic error");
     }
 }
