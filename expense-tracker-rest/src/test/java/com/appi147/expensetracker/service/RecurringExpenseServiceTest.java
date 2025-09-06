@@ -1,28 +1,34 @@
 package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.UserContext;
-import com.appi147.expensetracker.entity.PaymentType;
-import com.appi147.expensetracker.entity.RecurringExpense;
-import com.appi147.expensetracker.entity.SubCategory;
-import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.entity.*;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.RecurringExpenseCreateRequest;
+import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.repository.RecurringExpenseRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecurringExpenseServiceTest {
+
+    @Mock
+    private ExpenseRepository expenseRepository;
 
     @Mock
     private RecurringExpenseRepository recurringExpenseRepository;
@@ -173,5 +179,51 @@ class RecurringExpenseServiceTest {
             assertTrue(result.contains(r1));
             assertTrue(result.contains(r2));
         }
+    }
+
+    @Test
+    void createThisMonthExpenses_shouldSaveExpenses() {
+        // Arrange
+        User user = new User();
+        SubCategory subCategory = new SubCategory();
+        PaymentType paymentType = new PaymentType();
+
+        RecurringExpense r1 = new RecurringExpense();
+        r1.setAmount(new BigDecimal("100.50"));
+        r1.setComments("Monthly subscription");
+        r1.setCreatedBy(user);
+        r1.setSubCategory(subCategory);
+        r1.setPaymentType(paymentType);
+
+        when(recurringExpenseRepository.findByDayOfMonth(LocalDate.now().getDayOfMonth()))
+                .thenReturn(List.of(r1));
+
+        // Act
+        recurringExpenseService.createThisMonthExpenses();
+
+        // Assert
+        ArgumentCaptor<Expense> captor = ArgumentCaptor.forClass(Expense.class);
+        verify(expenseRepository, times(1)).save(captor.capture());
+
+        Expense saved = captor.getValue();
+        assertThat(saved.getAmount()).isEqualTo(new BigDecimal("100.50"));
+        assertThat(saved.getSubCategory()).isSameAs(subCategory);
+        assertThat(saved.getPaymentType()).isSameAs(paymentType);
+        assertThat(saved.getCreatedBy()).isSameAs(user);
+        assertThat(saved.getComments()).isEqualTo("Monthly subscriptionAdded by Recurring");
+        assertThat(saved.getDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void createThisMonthExpenses_emptyList_shouldNotSaveAnything() {
+        // Arrange
+        when(recurringExpenseRepository.findByDayOfMonth(LocalDate.now().getDayOfMonth()))
+                .thenReturn(List.of());
+
+        // Act
+        recurringExpenseService.createThisMonthExpenses();
+
+        // Assert
+        verify(expenseRepository, never()).save(any());
     }
 }

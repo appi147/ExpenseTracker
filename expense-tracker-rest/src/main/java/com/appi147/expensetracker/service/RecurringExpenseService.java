@@ -1,19 +1,18 @@
 package com.appi147.expensetracker.service;
 
 import com.appi147.expensetracker.auth.UserContext;
-import com.appi147.expensetracker.entity.PaymentType;
-import com.appi147.expensetracker.entity.RecurringExpense;
-import com.appi147.expensetracker.entity.SubCategory;
-import com.appi147.expensetracker.entity.User;
+import com.appi147.expensetracker.entity.*;
 import com.appi147.expensetracker.exception.BadRequestException;
 import com.appi147.expensetracker.exception.ForbiddenException;
 import com.appi147.expensetracker.exception.ResourceNotFoundException;
 import com.appi147.expensetracker.model.request.RecurringExpenseCreateRequest;
+import com.appi147.expensetracker.repository.ExpenseRepository;
 import com.appi147.expensetracker.repository.RecurringExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -21,6 +20,7 @@ import java.util.List;
 @Slf4j
 public class RecurringExpenseService {
 
+    private final ExpenseRepository expenseRepository;
     private final RecurringExpenseRepository recurringExpenseRepository;
     private final PaymentTypeService paymentTypeService;
     private final SubCategoryService subCategoryService;
@@ -73,5 +73,20 @@ public class RecurringExpenseService {
     public List<RecurringExpense> listRecurringExpensesForCurrentUser() {
         User user = UserContext.getCurrentUser();
         return recurringExpenseRepository.findByCreatedBy(user);
+    }
+
+    public void createThisMonthExpenses() {
+        List<RecurringExpense> recurringExpenses = recurringExpenseRepository.findByDayOfMonth(LocalDate.now().getDayOfMonth());
+        LocalDate today = LocalDate.now();
+        for (RecurringExpense recurringExpense : recurringExpenses) {
+            Expense expense = new Expense();
+            expense.setAmount(recurringExpense.getAmount());
+            expense.setDate(today);
+            expense.setSubCategory(recurringExpense.getSubCategory());
+            expense.setPaymentType(recurringExpense.getPaymentType());
+            expense.setCreatedBy(recurringExpense.getCreatedBy());
+            expense.setComments(recurringExpense.getComments() + "Added by Recurring");
+            expenseRepository.save(expense);
+        }
     }
 }

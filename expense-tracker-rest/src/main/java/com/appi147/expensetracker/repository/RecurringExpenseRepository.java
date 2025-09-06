@@ -11,4 +11,7 @@ public interface RecurringExpenseRepository extends JpaRepository<RecurringExpen
     @Query("select r from RecurringExpense r where r.createdBy = ?1")
     List<RecurringExpense> findByCreatedBy(User createdBy);
 
+    @Query("select r from RecurringExpense r where r.dayOfMonth = ?1")
+    List<RecurringExpense> findByDayOfMonth(int dayOfMonth);
+
 }
