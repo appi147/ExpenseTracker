@@ -5,10 +5,20 @@ import * as expSvc from '../../../src/services/expense-service'
 
 describe('components/insights/ExpenseInsight', () => {
   it('shows empty state when no data', async () => {
-    vi.spyOn(expSvc, 'getMonthlyInsight').mockResolvedValue({ totalExpense: 0, monthlyBudget: 0, categoryWiseExpenses: [] } as any)
-    render(<ExpenseInsight initialMonthly={true} />)
-    await screen.findByText('No expenses found')
-  })
+    vi.spyOn(expSvc, 'getMonthlyInsight').mockResolvedValue({
+      totalExpense: 0,
+      monthlyBudget: 0,
+      categoryWiseExpenses: []
+    } as any);
+
+    render(<ExpenseInsight initialMonthly={true} />);
+
+    // assertion that empty state text appears
+    expect(await screen.findByText('No expenses found')).toBeInTheDocument();
+
+    // optional extra assertion: ensure chart or list is not rendered
+    expect(screen.queryByTestId('category-expenses-chart')).not.toBeInTheDocument();
+  });
 
   it('renders budget and can toggle monthly flag', async () => {
     vi.spyOn(expSvc, 'getMonthlyInsight').mockResolvedValue({

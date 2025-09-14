@@ -120,6 +120,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
               />
               <Button
                 size="sm"
+                aria-label="Save category label"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleCategoryUpdate();
@@ -130,6 +131,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Discard changes"
                 onClick={(e) => {
                   e.stopPropagation();
                   setEditingCategoryId(null);
@@ -147,6 +149,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
                   variant="ghost"
                   size="icon"
                   className="h-5 w-5"
+                  aria-label="Edit category"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingCategoryId(category.categoryId);
@@ -162,6 +165,7 @@ export default function CategoryItem({ category, reloadCategories }: Props) {
                   variant="ghost"
                   size="icon"
                   className="h-5 w-5"
+                  aria-label="Delete category"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCategoryDelete();
