@@ -1,9 +1,27 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import * as Module from '../../src/pages/SiteWideInsights'
+import SiteWideInsights from '../../src/pages/SiteWideInsights'
+
+vi.mock('../../src/services/insight-service', () => ({
+  getInsight: vi.fn().mockResolvedValue({
+    totalUsersRegistered: 10,
+    totalUsersAddedExpense: 7,
+    totalExpensesAdded: 12345,
+    totalTransactionsAdded: 20,
+    totalCategoriesCreated: 5,
+    totalSubCategoriesCreated: 9,
+  })
+}))
 
 describe('SiteWideInsights.tsx', () => {
-  it('should have tests', () => {
-    expect(true).toBe(true)
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders cards with fetched values', async () => {
+    render(<SiteWideInsights />)
+    expect(await screen.findByText('Site-wide Insights')).toBeInTheDocument()
+    expect(await screen.findByText('Users Registered')).toBeInTheDocument()
+    expect(await screen.findByText('10')).toBeInTheDocument()
   })
 })
