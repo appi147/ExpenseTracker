@@ -27,12 +27,20 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { getAllCategories, type Category } from "@/services/category-service";
+import { getAllSubCategories, type SubCategory } from "@/services/sub-category-service";
+import { getAllPaymentTypes, type PaymentType } from "@/services/payment-type-service";
 
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [paymentTypes, setPaymentTypes] = useState<PaymentType[]>([]);
+
   const [exportOpen, setExportOpen] = useState(false);
   const [exportType, setExportType] = useState<"full" | "range">("full");
   const [exportDateRange, setExportDateRange] = useState<{ from: string; to: string } | null>(null);
@@ -51,6 +59,19 @@ export default function Expenses() {
     paymentTypeCode: "",
   });
 
+  useEffect(() => {
+    getAllCategories().then(setCategories);
+    getAllPaymentTypes().then(setPaymentTypes);
+  }, []);
+
+  useEffect(() => {
+    if (filters.categoryId) {
+      getAllSubCategories(filters.categoryId).then(setSubCategories);
+    } else {
+      setSubCategories([]);
+    }
+  }, [filters.categoryId]);
+
   const fetchExpenses = useCallback(async () => {
     const response = await getFilteredExpenses({
       categoryId: filters.categoryId ?? undefined,
@@ -64,6 +85,14 @@ export default function Expenses() {
     setExpenses(response.content);
     setTotalPages(response.totalPages);
   }, [filters, page, pageSize]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [filters, page, pageSize, fetchExpenses]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filters, pageSize]);
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -102,34 +131,6 @@ export default function Expenses() {
     [handleEditAmount, handleDelete],
   );
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [filters, page, pageSize, fetchExpenses]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [filters, pageSize]);
-
-  const categories = useMemo(() => {
-    const map = new Map<number, string>();
-    expenses.forEach((e) =>
-      map.set(e.subCategory.category.categoryId, e.subCategory.category.label),
-    );
-    return Array.from(map.entries());
-  }, [expenses]);
-
-  const subCategories = useMemo(() => {
-    const map = new Map<number, string>();
-    expenses.forEach((e) => map.set(e.subCategory.subCategoryId, e.subCategory.label));
-    return Array.from(map.entries());
-  }, [expenses]);
-
-  const paymentTypes = useMemo(() => {
-    const map = new Map<string, string>();
-    expenses.forEach((e) => map.set(e.paymentType.code, e.paymentType.label));
-    return Array.from(map.entries());
-  }, [expenses]);
-
   return (
     <div className="p-4 space-y-4">
       <Card>
@@ -141,52 +142,62 @@ export default function Expenses() {
           />
 
           <Select
+            aria-label="Category"
             value={filters.categoryId?.toString() ?? ""}
             onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, categoryId: val === "" ? null : Number(val) }))
+              setFilters((prev) => ({
+                ...prev,
+                categoryId: val === "" ? null : Number(val),
+                subCategoryId: null,
+              }))
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Category">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              {categories.map(([id, label]) => (
-                <SelectItem key={id} value={id.toString()}>
-                  {label}
+              {categories.map((cat) => (
+                <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
+                  {cat.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
           <Select
+            aria-label="Subcategory"
             value={filters.subCategoryId?.toString() ?? ""}
             onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, subCategoryId: val === "" ? null : Number(val) }))
+              setFilters((prev) => ({
+                ...prev,
+                subCategoryId: val === "" ? null : Number(val),
+              }))
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Subcategory">
               <SelectValue placeholder="Subcategory" />
             </SelectTrigger>
             <SelectContent>
-              {subCategories.map(([id, label]) => (
-                <SelectItem key={id} value={id.toString()}>
-                  {label}
+              {subCategories.map((sub) => (
+                <SelectItem key={sub.subCategoryId} value={sub.subCategoryId.toString()}>
+                  {sub.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
           <Select
+            aria-label="Payment Type"
             value={filters.paymentTypeCode}
             onValueChange={(val) => setFilters((prev) => ({ ...prev, paymentTypeCode: val }))}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Payment Type">
               <SelectValue placeholder="Payment Type" />
             </SelectTrigger>
             <SelectContent>
-              {paymentTypes.map(([code, label]) => (
-                <SelectItem key={code} value={code}>
-                  {label}
+              {paymentTypes.map((pt) => (
+                <SelectItem key={pt.code} value={pt.code}>
+                  {pt.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -282,10 +293,10 @@ export default function Expenses() {
         <div className="space-x-2">
           <button
             className="px-3 py-1 rounded text-sm 
-             bg-gray-100 hover:bg-gray-200 
-             dark:bg-gray-800 dark:hover:bg-gray-700 
-             dark:text-gray-100 text-gray-900 
-             disabled:opacity-50"
+                        bg-gray-100 hover:bg-gray-200 
+                        dark:bg-gray-800 dark:hover:bg-gray-700 
+                        dark:text-gray-100 text-gray-900 
+                        disabled:opacity-50"
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
             disabled={page <= 0}
           >
@@ -294,12 +305,12 @@ export default function Expenses() {
 
           <button
             className="px-3 py-1 rounded text-sm 
-             bg-gray-100 hover:bg-gray-200 
-             dark:bg-gray-800 dark:hover:bg-gray-700 
-             dark:text-gray-100 text-gray-900 
-             disabled:opacity-50"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={expenses.length < pageSize}
+                        bg-gray-100 hover:bg-gray-200 
+                        dark:bg-gray-800 dark:hover:bg-gray-700 
+                        dark:text-gray-100 text-gray-900 
+                        disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+            disabled={page >= totalPages - 1}
           >
             Next
           </button>

@@ -30,6 +30,7 @@ export const getExpenseColumns = (
         <button
           onClick={() => handleEditAmount(row.original)}
           className="text-blue-500 hover:text-blue-700"
+          aria-label="Edit"
         >
           <Pencil size={14} />
         </button>
@@ -52,6 +53,7 @@ export const getExpenseColumns = (
       <button
         onClick={() => handleDelete(row.original.expenseId)}
         className="text-red-500 hover:text-red-700"
+        aria-label="Delete"
       >
         <X size={16} />
       </button>
