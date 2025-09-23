@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { updateBudget } from "@/services/api";
+import { toast } from "sonner";
 
 export default function AccountPage() {
   const { user, setUser } = useAuth();
@@ -31,7 +32,7 @@ export default function AccountPage() {
       setEditMode(false);
     } catch (err) {
       console.error(err);
-      alert("Failed to update budget.");
+      toast.error("Failed to update budget.");
     } finally {
       setLoading(false);
     }
@@ -67,13 +68,13 @@ export default function AccountPage() {
               id="budget"
               type="text"
               inputMode="numeric"
-              pattern="[1-9][0-9]*|0"
+              pattern="[1-9]\\d*|0"
               value={budget === undefined ? "" : String(budget)}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "") {
                   setBudget(undefined);
-                } else if (/^(0|[1-9][0-9]*)$/.test(value)) {
+                } else if (/^(0|[1-9]\d*)$/.test(value)) {
                   setBudget(Number(value));
                 }
               }}

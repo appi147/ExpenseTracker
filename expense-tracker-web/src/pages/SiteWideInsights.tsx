@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { getInsight, type Insight } from "@/services/insight-service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -10,7 +11,11 @@ const SiteWideInsights: React.FC = () => {
   useEffect(() => {
     getInsight()
       .then(setData)
-      .catch(console.error)
+      .catch((err) => {
+        toast.error("Failed to load insights");
+        // Optionally log for diagnostics
+        console.error(err);
+      })
       .finally(() => setLoading(false));
   }, []);
 

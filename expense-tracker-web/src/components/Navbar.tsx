@@ -12,6 +12,7 @@ import {
 import { ModeToggle } from "@/components/mode-toggle";
 import { LogOut, User, BarChartBig } from "lucide-react";
 import { updateUserTheme, type ThemeType } from "@/services/api";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const { user, setUser, logout } = useAuth();
@@ -24,6 +25,7 @@ const Navbar = () => {
       }
     } catch (error) {
       console.error("Failed to update theme:", error);
+      toast.error("Failed to update theme");
     }
   };
 

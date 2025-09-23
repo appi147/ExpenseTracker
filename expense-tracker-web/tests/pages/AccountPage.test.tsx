@@ -1,17 +1,22 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import AccountPage from "@/pages/AccountPage";
-import * as api from "@/services/api";
+import { toast } from "sonner";
+import React from "react";
+import AccountPage from "../../src/pages/AccountPage";
+import * as api from "../../src/services/api";
 
 // Mock the API
 vi.mock("@/services/api", () => ({
   updateBudget: vi.fn(),
 }));
 
-// Mock window.alert
-const mockAlert = vi.fn();
-global.alert = mockAlert;
+// Mock toasts and alert
+vi.mock("sonner", () => ({
+  toast: {
+    error: vi.fn(),
+  },
+}));
 
 // Mock the auth context
 const mockUser = {
@@ -120,7 +125,7 @@ describe("AccountPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalledWith("Failed to update budget.");
+      expect(toast.error).toHaveBeenCalledWith("Failed to update budget.");
     });
   });
 

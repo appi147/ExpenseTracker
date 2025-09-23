@@ -7,6 +7,7 @@ import { createCategoryColorMap } from "@/utils/colors";
 import { CustomTooltip } from "@/components/trends/CustomTooltip";
 import { Button } from "@/components/ui/button";
 import { toPng } from "html-to-image";
+import { toast } from "sonner";
 
 type CustomLegendProps = {
   payload?: readonly LegendPayload[];
@@ -91,6 +92,7 @@ export default function MonthlyExpenseTrends() {
       link.click();
     } catch (err) {
       console.error("Export failed", err);
+      toast.error("Failed to export chart as PNG");
     }
   };
 

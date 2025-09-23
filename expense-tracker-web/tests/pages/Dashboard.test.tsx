@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import Dashboard from '../../src/pages/Dashboard'
 import * as expSvc from '../../src/services/expense-service'
 import { MemoryRouter } from 'react-router-dom'

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getToken, setToken as storeToken, clearToken } from "../utils/auth";
 import { getUserProfile, type ThemeType } from "../services/api";
 import { useTheme } from "@/components/theme-provider";
+import { toast } from "sonner";
 
 interface User {
   fullName: string;
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }: { readonly children: React.ReactNode 
         .then(setUser)
         .catch((err) => {
           console.error("Failed to fetch user profile:", err);
+          toast.error("Session expired. Please log in again.");
           logout();
         });
     }

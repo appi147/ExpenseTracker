@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getMonthlyExpense } from "@/services/expense-service";
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
+import { toast } from "sonner";
 import ToggleDuration from "@/components/insights/ToggleDuration";
 import { Plus, Repeat, IndianRupee } from "lucide-react";
 
@@ -22,6 +23,7 @@ const Dashboard = () => {
       setLast30DaysTotal(last30Days);
     } catch (err) {
       console.error("Failed to fetch monthly total:", err);
+      toast.error("Failed to load dashboard totals");
     }
   };
 

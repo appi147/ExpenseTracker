@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "sonner";
 import { GoogleLogin, useGoogleOneTapLogin, type CredentialResponse } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -13,12 +14,12 @@ const Login: React.FC = () => {
       setAuthToken(credentialResponse.credential);
       navigate("/");
     } else {
-      console.error("Credential missing in response");
+      toast.error("Credential missing in response");
     }
   };
 
   const handleError = () => {
-    console.log("Login Failed");
+    toast.error("Login failed. Please try again.");
   };
 
   useGoogleOneTapLogin({
