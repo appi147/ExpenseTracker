@@ -27,13 +27,15 @@ public class SecurityConfig {
                 .securityMatcher(request -> true)
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/expense/**", "/user/**", "/category/**", "/sub-category/**", "/payment-types/**", "/insights/**").authenticated()
-                        .anyRequest().denyAll()
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers("/user/login", "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers("/expense/**", "/user/**", "/category/**", "/sub-category/**", "/payment-types/**", "/insights/**", "/recurring-expense/**")
+                        .authenticated()
+                        .anyRequest()
+                        .denyAll()
                 )
-                .addFilterBefore(new GoogleTokenAuthenticationFilter(userService),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new GoogleTokenAuthenticationFilter(userService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

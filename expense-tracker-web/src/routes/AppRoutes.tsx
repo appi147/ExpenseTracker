@@ -10,6 +10,7 @@ import MonthlyInsights from "@/pages/MonthlyInsights";
 import SiteWideInsights from "@/pages/SiteWideInsights";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MonthlyTrendsPage from "@/pages/MonthlyTrendsPage";
+import RecurringExpensesPage from "@/pages/RecurringExpensesPage";
 
 const AppRoutes = () => {
   return (
@@ -87,7 +88,16 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/expenses/recurring"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <RecurringExpensesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="*"
           element={
